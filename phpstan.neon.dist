@@ -8,7 +8,12 @@ parameters:
     - src
 
   ignoreErrors:
+    # This is a wrong annotation in slim/pdo
     - '#Parameter .2 .operator of method Slim.PDO.Statement.StatementContainer::where.. expects null, string given.#'
+
+    # This is a wrong annotation in slim/slim
     - '#Return type .string. of method .*::renderHtmlNotFoundOutput.. should be compatible with return type .Psr.Http.Message.ResponseInterface. of method Slim.Handlers.NotFound::renderHtmlNotFoundOutput()#'
+
+    # This is a slight abuse of the interface, which will be removed when switching to slim v4
     - '#Parameter .1 .container of method Slim.DefaultServicesProvider::register.. expects Slim.Container, ArrayObject given.#'
 

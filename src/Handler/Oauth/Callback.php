@@ -25,7 +25,8 @@ class Callback implements RequestHandlerInterface
         $this->db = $db;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
         $params = $request->getQueryParams();
         $code = $params['code'] ?? '';
         file_put_contents('../logs/oauth-callback-' . date('Y-m-d_his'), json_encode($params));
@@ -58,10 +59,10 @@ class Callback implements RequestHandlerInterface
             $data = json_decode((string) $res->getBody(), true);
             if (($data['ok'] ?? false) === false) {
                 switch ($data['error'] ?? null) {
-                case 'code_already_used':
-                case 'invalid_copde':
-                    //return new Response(404);
-                    break;
+                    case 'code_already_used':
+                    case 'invalid_copde':
+                        //return new Response(404);
+                        break;
                 }
                 throw new \Exception('oauth error: ' . $data['error'] ?? '');
             }
@@ -76,11 +77,20 @@ class Callback implements RequestHandlerInterface
 
             $team_id = $workspace['team_id'];
             // Update existing workspace association or create a new one.
-            $current = $this->db->select(['id'])->from('workspaces')->where('team_id', '=', $team_id)->execute()->fetch();
+            $current = $this->db
+                ->select(['id'])
+                ->from('workspaces')
+                ->where('team_id', '=', $team_id)
+                ->execute()
+                ->fetch();
             if ($current) {
                 $this->db->update($workspace)->table('workspaces')->where('team_id', '=', $team_id)->execute();
             } else {
-                $this->db->insert(array_keys($workspace))->into('workspaces')->values(array_values($workspace))->execute();
+                $this->db
+                    ->insert(array_keys($workspace))
+                    ->into('workspaces')
+                    ->values(array_values($workspace))
+                    ->execute();
             }
         } else {
             $response = new Response(400);

@@ -24,7 +24,7 @@ class NotFound extends SlimNotFoundHandler
      */
     protected function renderHtmlNotFoundOutput(ServerRequestInterface $request): string
     {
-        $homeUrl = (string)($request->getUri()->withPath('')->withQuery('')->withFragment(''));
+        $homeUrl = (string) ($request->getUri()->withPath('')->withQuery('')->withFragment(''));
         return <<<END
 <!DOCTYPE html>
 <html>

@@ -24,7 +24,8 @@ class FileContents implements RequestHandlerInterface
         $this->filename = $filename;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
         return new Response(200, null, new Stream(fopen($this->filename, 'r')));
     }
 }

@@ -15,7 +15,8 @@ use Slim\Http\Response;
  */
 class Interaction implements RequestHandlerInterface
 {
-    public function handle(ServerRequestInterface $request): ResponseInterface {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
         $body = (string) $request->getBody();
         $data = json_decode($body);
 

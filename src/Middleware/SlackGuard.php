@@ -28,7 +28,10 @@ class SlackGuard implements MiddlewareInterface
         $body = (string) $request->getBody();
         $sig_basestring = implode(':', ['v0', $timestamp, $body]);
         $computed_signature = 'v0=' . hash_hmac('sha256', $sig_basestring, $signingSecret, false);
-        file_put_contents('../logs/sign-' . date('Y-m-d_his'), $timestamp . "\n" . $slack_signature . "\n" . $computed_signature);
+        file_put_contents(
+            '../logs/sign-' . date('Y-m-d_his'),
+            $timestamp . "\n" . $slack_signature . "\n" . $computed_signature
+        );
         if (!hash_equals($slack_signature, $computed_signature)) {
             throw new \Exception('Invalid request, slack signature is wrong');
         }

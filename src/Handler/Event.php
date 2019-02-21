@@ -16,7 +16,8 @@ use Slim\Http\Headers;
  */
 class Event implements RequestHandlerInterface
 {
-    public function handle(ServerRequestInterface $request): ResponseInterface {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
         $body = (string) $request->getBody();
         $data = json_decode($body);
 
@@ -31,7 +32,7 @@ class Event implements RequestHandlerInterface
             file_put_contents('../token', $token);
         }
 
-        $response = new Response(200, new Headers(['Content-type' => 'application/json']);
+        $response = new Response(200, new Headers(['Content-type' => 'application/json']));
         $response->getBody()->write(json_encode($res));
 
         return $response;

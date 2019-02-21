@@ -16,7 +16,8 @@ use Slim\Http\Headers;
  */
 class Command implements RequestHandlerInterface
 {
-    public function handle(ServerRequestInterface $request): ResponseInterface {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
         file_put_contents('../logs/command-' . date('Y-m-d_his'), (string) $request->getBody());
 
         $body = $request->getParsedBody();
@@ -32,7 +33,7 @@ class Command implements RequestHandlerInterface
         ];
         $res->attachments[0]->text = 'attachment, text was: ' . $text;
 
-        $response = new Response(200, new Headers(['Content-type' => 'application/json']);
+        $response = new Response(200, new Headers(['Content-type' => 'application/json']));
         $response->getBody()->write(json_encode($res));
 
         return $response;

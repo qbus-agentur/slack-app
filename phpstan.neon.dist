@@ -1,0 +1,14 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+  level: max
+
+  paths:
+    - src
+
+  ignoreErrors:
+    - '#Parameter .2 .operator of method Slim.PDO.Statement.StatementContainer::where.. expects null, string given.#'
+    - '#Return type .string. of method .*::renderHtmlNotFoundOutput.. should be compatible with return type .Psr.Http.Message.ResponseInterface. of method Slim.Handlers.NotFound::renderHtmlNotFoundOutput()#'
+    - '#Parameter .1 .container of method Slim.DefaultServicesProvider::register.. expects Slim.Container, ArrayObject given.#'
+

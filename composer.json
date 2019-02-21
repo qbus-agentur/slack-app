@@ -32,5 +32,10 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "start": "php -S 127.0.0.1:8088 -t public public/router.php"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.11.2",
+        "phpstan/phpstan-strict-rules": "^0.11.0",
+        "squizlabs/php_codesniffer": "^3.4"
     }
 }

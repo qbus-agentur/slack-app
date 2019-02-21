@@ -19,7 +19,7 @@ class Command implements RequestHandlerInterface
 {
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        file_put_contents(__DIR__ . '/../../logs/command-' . date('Y-m-d_his'), (string) $request->getBody());
+        file_put_contents(__DIR__ . '/../../logs/command-' . date('Y-m-d_His'), (string) $request->getBody());
 
         $body = $request->getParsedBody();
         //

@@ -29,7 +29,7 @@ class Callback implements RequestHandlerInterface
     {
         $params = $request->getQueryParams();
         $code = $params['code'] ?? '';
-        file_put_contents('../logs/oauth-callback-' . date('Y-m-d_his'), json_encode($params));
+        file_put_contents(__DIR__ . '/../../../logs/oauth-callback-' . date('Y-m-d_His'), json_encode($params));
 
         $state = $params['state'] ?? '';
         if ($_SESSION['state_token'] !== $state) {

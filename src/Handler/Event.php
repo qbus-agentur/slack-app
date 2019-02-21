@@ -30,7 +30,7 @@ class Event implements RequestHandlerInterface
             $res->challenge = $data->challenge ?? '';
 
             $token = $data->token ?? '';
-            file_put_contents('../token', $token);
+            file_put_contents(__DIR__ . '/../../token', $token);
         }
 
         return new JsonResponse($res);

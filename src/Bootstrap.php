@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Server\MiddlewareInterface;
-use Psr\Logger\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Slim\App;
 use Slim\Collection;
 use Slim\Interfaces\CallableResolverInterface;
@@ -110,11 +110,11 @@ class Bootstrap implements ServiceProviderInterface
         ];
     }
 
-    protected function addMiddleware(App $app)
+    protected function addMiddleware(App $app): void
     {
     }
 
-    protected function addRoutes(App $app)
+    protected function addRoutes(App $app): void
     {
         $app->get('/install', Handler\Oauth\Start::class)->setName('oauth-start');
         $app->get('/oauth/callback', Handler\Oauth\Callback::class)->setName('oauth-callback');

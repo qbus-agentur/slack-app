@@ -16,10 +16,15 @@ use Slim\Http\Headers;
  */
 class Start implements RequestHandlerInterface
 {
-    public function handle(ServerRequestInterface $request): ResponseInterface {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $random = openssl_random_pseudo_bytes(1024);
+        if ($random === false) {
+            throw new \Exception('openssl can not generate random bytes');
+        }
         // Create a state token to prevent request forgery.
         // Store it in the session for later validation.
-        $state = sha1(openssl_random_pseudo_bytes(1024));
+        $state = sha1($random);
         $_SESSION['state_token'] = $state;
 
         $url = sprintf(

@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Http\Response;
-use Slim\Http\Stream;
+use Slim\Http\Body;
 
 /**
  * Serve contents of a file
@@ -26,6 +26,11 @@ class FileContents implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return new Response(200, null, new Stream(fopen($this->filename, 'r')));
+        $file = fopen($this->filename, 'r');
+        if ($file === false) {
+            throw new \Exception('Failed to open ' . $this->filename . '.');
+        }
+
+        return new Response(200, null, new Body($file));
     }
 }

@@ -83,7 +83,7 @@ class Callback implements RequestHandlerInterface
                 ->where('team_id', '=', $team_id)
                 ->execute()
                 ->fetch();
-            if ($current) {
+            if ($current !== false) {
                 $this->db->update($workspace)->table('workspaces')->where('team_id', '=', $team_id)->execute();
             } else {
                 $this->db

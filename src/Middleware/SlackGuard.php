@@ -14,7 +14,7 @@ class SlackGuard implements MiddlewareInterface
 {
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        $signingSecret = getenv('SLACK_SIGNING_SECRET');
+        $signingSecret = (string) getenv('SLACK_SIGNING_SECRET');
 
         $timestamp = intval($request->getHeaderLine('X-Slack-Request-Timestamp'));
         $slack_signature = $request->getHeaderLine('X-Slack-Signature');

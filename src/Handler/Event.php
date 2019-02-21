@@ -22,7 +22,7 @@ class Event implements RequestHandlerInterface
         $body = (string) $request->getBody();
         $data = json_decode($body);
 
-        file_put_contents('../logs/event-' . date('Y-m-d_his'), $body);
+        file_put_contents(__DIR__ . '/../../logs/event-' . date('Y-m-d_his'), $body);
 
         $res = new \stdClass;
 

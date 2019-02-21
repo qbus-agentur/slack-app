@@ -20,7 +20,7 @@ class Interaction implements RequestHandlerInterface
         $body = (string) $request->getBody();
         $data = json_decode($body);
 
-        file_put_contents('../logs/interaction-' . date('Y-m-d_his'), $body);
+        file_put_contents(__DIR__ . '/../../logs/interaction-' . date('Y-m-d_his'), $body);
 
         return new Response;
     }

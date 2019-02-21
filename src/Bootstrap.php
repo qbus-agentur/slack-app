@@ -55,7 +55,7 @@ class Bootstrap implements ServiceProviderInterface
 
                 return new Database($dsn, $settings['user'], $settings['pass']);
             },
-            'log' => function (CI $c): LoggerInterface {
+            LoggerInterface::class => function (CI $c): LoggerInterface {
                 $settings = $c->get('settings')['log'];
                 $logger = new \Monolog\Logger($settings['name']);
                 $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
@@ -63,14 +63,25 @@ class Bootstrap implements ServiceProviderInterface
                 return $logger;
             },
             'guard' => function (CI $c): MiddlewareInterface {
-                return new Middleware\SlackGuard;
+                return new Middleware\SlackGuard($c->get(LoggerInterface::class));
             },
             'notFoundHandler' => function (CI $c): callable {
-                return new Handler\NotFound;
+                return new Handler\Error\NotFound;
             },
-
+            'erorHandler' => function (CI $c): callable {
+                return new Handler\Error\Error(
+                    $c->get('settings')['displayErrorDetails'],
+                    $c->get(LoggerInterface::class)
+                );
+            },
+            'phpErrorHandler' => function (CI $c): callable {
+                return new Handler\Error\PhpError(
+                    $c->get('settings')['displayErrorDetails'],
+                    $c->get(LoggerInterface::class)
+                );
+            },
             Handler\Event::class => function (CI $c): RequestHandler {
-                return new Handler\Event;
+                return new Handler\Event($c->get(LoggerInterface::class));
             },
             Handler\Command::class => function (CI $c): RequestHandler {
                 return new Handler\Command;
@@ -104,6 +115,8 @@ class Bootstrap implements ServiceProviderInterface
             'app' => function (CI $c, App $app): App {
                 $this->addMiddleware($app);
                 $this->addRoutes($app);
+
+                $c->get(LoggerInterface::class)->info('constructed app');
 
                 return $app;
             },

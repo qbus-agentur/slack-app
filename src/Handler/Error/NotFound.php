@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Qbus\SlackApp\Handler;
+namespace Qbus\SlackApp\Handler\Error;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Handlers\NotFound as SlimNotFoundHandler;

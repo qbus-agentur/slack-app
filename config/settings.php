@@ -1,7 +1,6 @@
 <?php
 return [
     'displayErrorDetails' => PHP_SAPI == 'cli-server', // set to false in production
-    'displayErrorDetails' => true,
     'addContentLengthHeader' => false, // Allow the web server to send the content-length header
 
     /* As far as i can see output buffering is pure convenience in slim:

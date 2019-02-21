@@ -16,4 +16,4 @@ phpcs: vendor/autoload.php
 	vendor/bin/phpcs
 
 sync:
-	rsync --verbose -e 'ssh -p222' --exclude .git --exclude token --exclude logs --delete -az ./ qbusio@qbus.de:public_html/slack/
+	rsync --verbose -e 'ssh -p222' --exclude .git --exclude token --exclude logs --exclude 'var/log/*' --delete -az ./ qbusio@qbus.de:public_html/slack/

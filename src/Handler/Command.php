@@ -5,6 +5,7 @@ namespace Qbus\SlackApp\Handler;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Qbus\SlackApp\Http\JsonResponse;
 use Slim\Http\Response;
 use Slim\Http\Headers;
 
@@ -33,9 +34,6 @@ class Command implements RequestHandlerInterface
         ];
         $res->attachments[0]->text = 'attachment, text was: ' . $text;
 
-        $response = new Response(200, new Headers(['Content-type' => 'application/json']));
-        $response->getBody()->write(json_encode($res));
-
-        return $response;
+        return new JsonResponse($res);
     }
 }

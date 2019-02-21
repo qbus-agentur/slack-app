@@ -1,46 +1,40 @@
 <?php
-namespace Qbus\SlackApp\Controller;
+declare(strict_types = 1);
+namespace Qbus\SlackApp\Handler\Oauth;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Http\Response;
+use Slim\Http\Headers;
+use Slim\PDO\Database;
 
 /**
- * Oauth
+ * Handle oauth callback from slack
  *
  * @author Benjamin Franzke <bfr@qbus.de>
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Oauth extends AbstractController
+class Callback implements RequestHandlerInterface
 {
-    public function start(Request $request, Response $response) {
-        $body = (string) $request->getBody();
-        $data = json_decode($body);
+    /** @var Database */
+    protected $db;
 
-        // Create a state token to prevent request forgery.
-        // Store it in the session for later validation.
-        $state = sha1(openssl_random_pseudo_bytes(1024));
-        $_SESSION['state_token'] = $state;
-
-        $url = sprintf(
-            '%s/oauth/authorize?client_id=%s&scope=%s&state=%s',
-            getenv('SLACK_ROOT_URL') ?: 'https://slack.com',
-            getenv('SLACK_CLIENT_ID'),
-            'links:read,links:write,commands,chat:write,team:read,channels:history,groups:history,im:history',
-            $state
-        );
-
-        return $response->withStatus(302)->withHeader('Location', $url);
+    public function __construct(Database $db)
+    {
+        $this->db = $db;
     }
 
-    public function callback(Request $request, Response $response) {
+    public function handle(ServerRequestInterface $request): ResponseInterface {
         $params = $request->getQueryParams();
         $code = $params['code'] ?? '';
         file_put_contents('../logs/oauth-callback-' . date('Y-m-d_his'), json_encode($params));
 
         $state = $params['state'] ?? '';
         if ($_SESSION['state_token'] !== $state) {
+            $response = new Response(401);
             $response->getBody()->write('Invalid state parameter');
-            return $response->withStatus(401);
+            return $response;
         }
 
         $api_url = sprintf(
@@ -63,9 +57,14 @@ class Oauth extends AbstractController
         if ($res->getStatusCode() === 200) {
             $data = json_decode((string) $res->getBody(), true);
             if (($data['ok'] ?? false) === false) {
+                switch ($data['error'] ?? null) {
+                case 'code_already_used':
+                case 'invalid_copde':
+                    //return new Response(404);
+                    break;
+                }
                 throw new \Exception('oauth error: ' . $data['error'] ?? '');
             }
-            $pdo = $this->get('db');
 
             $workspace = [
                 'team_id' => $data['team_id'],
@@ -77,13 +76,14 @@ class Oauth extends AbstractController
 
             $team_id = $workspace['team_id'];
             // Update existing workspace association or create a new one.
-            $current = $pdo->select(['id'])->from('workspaces')->where('team_id', '=', $team_id)->execute()->fetch();
+            $current = $this->db->select(['id'])->from('workspaces')->where('team_id', '=', $team_id)->execute()->fetch();
             if ($current) {
-                $this->get('db')->update($workspace)->table('workspaces')->where('team_id', '=', $team_id)->execute();
+                $this->db->update($workspace)->table('workspaces')->where('team_id', '=', $team_id)->execute();
             } else {
-                $this->get('db')->insert(array_keys($workspace))->into('workspaces')->values(array_values($workspace))->execute();
+                $this->db->insert(array_keys($workspace))->into('workspaces')->values(array_values($workspace))->execute();
             }
         } else {
+            $response = new Response(400);
             $response->getBody()->write('Failed.');
             return $response;
         }
@@ -95,6 +95,6 @@ class Oauth extends AbstractController
             $team_id
         );
 
-        return $response->withStatus(302)->withHeader('Location', $url);
+        return new Response(302, new Headers(['Location' => $url]));
     }
 }

@@ -1,11 +1,19 @@
 <?php
+declare(strict_types = 1);
 namespace Qbus\SlackApp;
 
+use Bnf\Slim3Psr15\CallableResolver as Psr15CallableResolver;
 use Interop\Container\ServiceProviderInterface;
 use Psr\Container\ContainerInterface as CI;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Logger\LoggerInterface;
 use Slim\App;
+use Slim\Collection;
+use Slim\Interfaces\CallableResolverInterface;
+use Slim\PDO\Database;
 
 /**
  * Bootstrap
@@ -19,10 +27,10 @@ use Slim\App;
  */
 class Bootstrap implements ServiceProviderInterface
 {
-    public function getFactories()
+    public function getFactories(): array
     {
-        $services = [
-            'settings' => function (CI $c) {
+        $services = new \ArrayObject([
+            'settings' => function (CI $c): Collection {
                 $slimDefaultSettings = [
                     'httpVersion' => '1.1',
                     'responseChunkSize' => 4096,
@@ -33,56 +41,67 @@ class Bootstrap implements ServiceProviderInterface
                     'routerCacheFile' => false,
                 ];
                 $settings = require __DIR__ . '/../config/settings.php';
-                return new \Slim\Collection(array_merge($slimDefaultSettings, $settings));
+                return new Collection(array_merge($slimDefaultSettings, $settings));
             },
-            'app' => function (CI $c) {
+            'app' => function (CI $c): App {
                 return new App($c);
             },
-            'callableResolver' => function (CI $c) {
-                return new \Bnf\Slim3Psr15\CallableResolver($c);
+            'callableResolver' => function (CI $c): CallableResolverInterface {
+                return new Psr15CallableResolver($c);
             },
-            'db' => function (CI $c) {
+            'db' => function (CI $c): Database {
                 $settings = $c->get('settings')['db'];
                 $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8', $settings['host'], $settings['name']);
 
-                return new \Slim\PDO\Database($dsn, $settings['user'], $settings['pass']);
+                return new Database($dsn, $settings['user'], $settings['pass']);
             },
-            'log' => function (CI $c) {
+            'log' => function (CI $c): LoggerInterface {
                 $settings = $c->get('settings')['log'];
                 $logger = new \Monolog\Logger($settings['name']);
                 $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
                 $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
                 return $logger;
             },
-            'guard' => function (CI $c) {
-                return new \Qbus\SlackApp\Middleware\SlackGuard;
+            'guard' => function (CI $c): MiddlewareInterface {
+                return new Middleware\SlackGuard;
             },
-            'notFoundHandler' => function (CI $c) {
-                return new Handlers\NotFound;
+            'notFoundHandler' => function (CI $c): callable {
+                return new Handler\NotFound;
             },
-            Controller\Oauth::class => function (CI $c) {
-                return new Controller\Oauth($c->get('db'));
+
+            Handler\Event::class => function (CI $c): RequestHandler {
+                return new Handler\Event;
             },
-        ];
+            Handler\Command::class => function (CI $c): RequestHandler {
+                return new Handler\Command;
+            },
+            Handler\Interaction::class => function (CI $c): RequestHandler {
+                return new Handler\Interaction;
+            },
 
-        $defaultServices = new \ArrayObject;
-        (new \Slim\DefaultServicesProvider)->register($defaultServices);
+            Handler\Oauth\Start::class => function (CI $c): RequestHandler {
+                return new Handler\Oauth\Start;
+            },
+            Handler\Oauth\Callback::class => function (CI $c): RequestHandler {
+                return new Handler\Oauth\Callback($c->get('db'));
+            },
+            'handler.start' => function (CI $c): RequestHandler {
+                return new Handler\Generic\FileContents(__DIR__ . '/../templates/index.html');
+            },
+        ]);
 
-        foreach ($defaultServices as $service => $callable) {
-            if (!isset($services[$service])) {
-                $services[$service] = $callable;
-            }
-        }
+        (new \Slim\DefaultServicesProvider)->register($services);
 
-        return $services;
+        // Should bnf/di support \ArrayAcces in service providers?
+        return $services->getArrayCopy();
     }
 
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return [
             /* This is just to demonstrate the 'extensions' function,
              * we could do the same in the app factory. */
-            'app' => function (CI $c, App $app) {
+            'app' => function (CI $c, App $app): App {
                 $this->addMiddleware($app);
                 $this->addRoutes($app);
 
@@ -97,75 +116,13 @@ class Bootstrap implements ServiceProviderInterface
 
     protected function addRoutes(App $app)
     {
-        $app->post(
-            '/command',
-            function (Request $request, Response $response, array $args) {
+        $app->get('/install', Handler\Oauth\Start::class)->setName('oauth-start');
+        $app->get('/oauth/callback', Handler\Oauth\Callback::class)->setName('oauth-callback');
 
-                file_put_contents('../logs/command-' . date('Y-m-d_his'), (string) $request->getBody());
+        $app->post('/command', Handler\Command::class)->add('guard')->setName('slack-command');
+        $app->post('/event', Handler\Event::class)->add('guard')->setName('slack-event');
+        $app->post('/interaction', Handler\Interaction::class)->add('guard')->setName('slack-interaction');
 
-                $body = $request->getParsedBody();
-                //
-                //$dump = print_r($body, true);
-                $text = $body['text'] ?? 'no-text';
-
-                $res = new \stdClass;
-                $res->response_type = 'in_channel';
-                $res->text = 'Some Answer';
-                $res->attachments = [
-                    0 => (new \stdClass),
-                ];
-                $res->attachments[0]->text = 'attachment, text was: ' . $text;
-
-                $response = $response->withHeader('Content-type', 'application/json');
-                $response->getBody()->write(json_encode($res));
-
-                return $response;
-            }
-        )->add('guard')->setName('slack-command');
-        $app->post(
-            '/event',
-            function (Request $request, Response $response, array $args) {
-                $body = (string) $request->getBody();
-                $data = json_decode($body);
-
-                file_put_contents('../logs/event-' . date('Y-m-d_his'), $body);
-
-                if (($data->type ?? '') === 'url_verification') {
-                    $res = new \stdClass;
-                    $res->challenge = $data->challenge ?? '';
-
-                    $token = $data->token ?? '';
-                    file_put_contents('../token', $token);
-
-                    $response = $response->withHeader('Content-type', 'application/json');
-                    $response->getBody()->write(json_encode($res));
-                }
-
-                return $response;
-            }
-        )->add('guard')->setName('slack-event');
-        $app->post(
-            '/interaction',
-            function (Request $request, Response $response, array $args) {
-                $body = (string) $request->getBody();
-                $data = json_decode($body);
-
-                file_put_contents('../logs/interaction-' . date('Y-m-d_his'), $body);
-
-                return $response;
-            }
-        )->add('guard')->setName('slack-event');
-
-
-        $app->get('/install', Controller\Oauth::class . ':start')->setName('oauth-start');
-        $app->get('/oauth/callback', Controller\Oauth::class . ':callback')->setName('oauth-callback');
-
-        $app->get(
-            '/',
-            function (Request $request, Response $response) {
-                $response->getBody()->write(file_get_contents(__DIR__ . '/../templates/index.html'));
-                return $response;
-            }
-        );
+        $app->get('/', 'handler.start');
     }
 }

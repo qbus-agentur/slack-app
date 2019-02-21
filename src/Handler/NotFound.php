@@ -1,7 +1,9 @@
 <?php
-namespace Qbus\QAC\Handlers;
+declare(strict_types = 1);
+namespace Qbus\SlackApp\Handler;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Handlers\NotFound as SlimNotFoundHandler;
 
 /**
  * Not found handler.
@@ -12,17 +14,15 @@ use Psr\Http\Message\ServerRequestInterface;
  * @author Benjamin Franzke <bfr@qbus.de>
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class NotFound extends \Slim\Handlers\NotFound
+class NotFound extends SlimNotFoundHandler
 {
-
     /**
      * Return a response for text/html content not found
      *
      * @param  ServerRequestInterface $request  The most recent Request object
-     *
-     * @return ResponseInterface
+     * @return string
      */
-    protected function renderHtmlNotFoundOutput(ServerRequestInterface $request)
+    protected function renderHtmlNotFoundOutput(ServerRequestInterface $request): string
     {
         $homeUrl = (string)($request->getUri()->withPath('')->withQuery('')->withFragment(''));
         return <<<END

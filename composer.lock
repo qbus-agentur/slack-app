@@ -59,16 +59,16 @@
         },
         {
             "name": "bnf/slim3-psr15",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bnf/slim3-psr15.git",
-                "reference": "3f2c9c6e42c395a4aaa8cddbffc25a14b632a6ac"
+                "reference": "545fe86677d12e19fa73bf1af2415c3ee2fa6ee0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bnf/slim3-psr15/zipball/3f2c9c6e42c395a4aaa8cddbffc25a14b632a6ac",
-                "reference": "3f2c9c6e42c395a4aaa8cddbffc25a14b632a6ac",
+                "url": "https://api.github.com/repos/bnf/slim3-psr15/zipball/545fe86677d12e19fa73bf1af2415c3ee2fa6ee0",
+                "reference": "545fe86677d12e19fa73bf1af2415c3ee2fa6ee0",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "psr",
                 "slim"
             ],
-            "time": "2018-01-23T18:10:13+00:00"
+            "time": "2019-01-28T23:17:01+00:00"
         },
         {
             "name": "container-interop/container-interop",

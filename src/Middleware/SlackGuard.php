@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 namespace Qbus\SlackApp\Middleware;
 
 use Psr\Http\Server\MiddlewareInterface;

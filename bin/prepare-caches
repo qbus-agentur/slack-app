@@ -1,11 +1,12 @@
 #!/usr/bin/env php
 <?php
-include_once __DIR__ . '/../vendor/autoload.php';
 
-$container = (new \Bnf\Di\Container([new \Qbus\SlackApp\Bootstrap]));
+(function() {
+    $container = require __DIR__ . '/../bootstrap.php';
 
-// trigger route configuration
-$container->get('app');
+    // trigger route configuration
+    $container->get('app');
 
-// create caches
-$container->get('router')->createCaches();
+    // create caches
+    $container->get('router')->createCaches();
+})();

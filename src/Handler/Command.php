@@ -22,7 +22,12 @@ class Command implements RequestHandlerInterface
         file_put_contents(__DIR__ . '/../../logs/command-' . date('Y-m-d_His'), (string) $request->getBody());
 
         $body = $request->getParsedBody();
-        //
+
+        $command = $body['command'] ?? null;
+        if ($command !== '/qbus') {
+            return new JsonResponse([], 400);
+        }
+
         //$dump = print_r($body, true);
         $text = $body['text'] ?? 'no-text';
 

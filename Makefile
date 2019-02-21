@@ -15,5 +15,6 @@ stan: vendor/autoload.php
 phpcs: vendor/autoload.php
 	vendor/bin/phpcs
 
-sync: check
+deploy: check
+	rm -rf var/cache/*
 	rsync --verbose -e 'ssh -p222' --exclude .git --exclude token --exclude logs --exclude 'var/log/*' --delete -az ./ qbusio@qbus.de:public_html/slack/

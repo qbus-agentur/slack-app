@@ -17,4 +17,6 @@ phpcs: vendor/autoload.php
 
 deploy: check
 	rm -rf var/cache/*
+	# @todo: use specific composer command for production:
+	#   composer install --no-dev  --optimize-autoloader --classmap-authoritative --prefer-dist
 	rsync --verbose -e 'ssh -p222' --exclude .git --exclude token --exclude logs --exclude 'var/log/*' --delete -az ./ qbusio@qbus.de:public_html/slack/

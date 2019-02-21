@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Slim\App;
 use Slim\Collection;
 use Slim\Interfaces\CallableResolverInterface;
+use Slim\Interfaces\RouterInterface;
 use Slim\PDO\Database;
 
 /**
@@ -48,6 +49,14 @@ class Bootstrap implements ServiceProviderInterface
             },
             'callableResolver' => function (CI $c): CallableResolverInterface {
                 return new Psr15CallableResolver($c);
+            },
+            'router' => function (CI $c): RouterInterface {
+                $routerCacheFile = $c->get('settings')['routerCacheFile'] ?? false;
+
+                $router = (new Router)->setCacheFile($routerCacheFile);
+                $router->setContainer($c);
+
+                return $router;
             },
             'db' => function (CI $c): Database {
                 $settings = $c->get('settings')['db'];

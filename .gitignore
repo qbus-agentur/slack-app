@@ -4,3 +4,5 @@
 /var/cache/*
 !/var/cache/.gitkeep
 /.env
+
+/.deploy

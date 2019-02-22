@@ -18,6 +18,5 @@ phpcs: vendor/autoload.php
 deploy: check
 	rsync --verbose --exclude .git --exclude token --exclude logs --exclude vendor/ --exclude 'var/log/*' --exclude '/.deploy' --delete -az ./ .deploy/
 	cd .deploy/ && composer install --no-dev --optimize-autoloader --classmap-authoritative --prefer-dist
-	rm -rf .deploy/var/cache/*
-	.deploy/bin/prepare-caches
+	.deploy/bin/warmup-caches
 	rsync --verbose -e 'ssh -p222' --exclude .git --exclude token --exclude logs --exclude 'var/log/*' --delete -az .deploy/ qbusio@qbus.de:public_html/slack/

@@ -7,6 +7,6 @@
     // trigger route configuration
     $container->get('app');
 
-    // create caches
-    $container->get('router')->createCaches();
+    // warmup caches
+    $container->get('router')->warmupCaches();
 })();

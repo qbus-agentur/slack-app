@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8db2a414e98af145cbf5c92cb060077a",
+    "content-hash": "274a57ed5d063e23879ad1763e118f3a",
     "packages": [
         {
             "name": "bnf/di",
@@ -63,6 +63,57 @@
                 "service-provider"
             ],
             "time": "2019-02-09T11:41:48+00:00"
+        },
+        {
+            "name": "bnf/slim-interop-service-provider",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bnf/slim-interop-service-provider.git",
+                "reference": "20a06eab1fa902a5eef0f7979d05234a8ed9c485"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bnf/slim-interop-service-provider/zipball/20a06eab1fa902a5eef0f7979d05234a8ed9c485",
+                "reference": "20a06eab1fa902a5eef0f7979d05234a8ed9c485",
+                "shasum": ""
+            },
+            "require": {
+                "container-interop/service-provider": "~0.4.0",
+                "php": "^7.0",
+                "psr/container": "^1.0",
+                "slim/slim": "^3.0"
+            },
+            "require-dev": {
+                "bnf/di": "^0.1.3",
+                "phpstan/phpstan": "^0.11.2",
+                "phpstan/phpstan-strict-rules": "^0.11.0",
+                "squizlabs/php_codesniffer": "^3.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Bnf\\SlimInterop\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Benjamin Franzke",
+                    "email": "benjaminfranzke@gmail.com",
+                    "homepage": "https://bnfr.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "container-interop/service-provider compatible service provider for Slim",
+            "keywords": [
+                "PSR-11",
+                "service-provider"
+            ],
+            "time": "2019-02-22T10:17:46+00:00"
         },
         {
             "name": "bnf/slim3-psr15",

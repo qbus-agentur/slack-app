@@ -20,6 +20,7 @@
         "vlucas/phpdotenv": "^2.4",
         "bnf/slim3-psr15": "^1.0",
         "bnf/di": "^0.1.2",
+        "bnf/slim-interop-service-provider": "^3.0",
         "guzzlehttp/guzzle": "^6.3"
     },
     "autoload": {

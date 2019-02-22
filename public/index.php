@@ -5,5 +5,5 @@
 
     session_start();
 
-    $container->get('app')->run();
+    $container->get(\Slim\App::class)->run();
 })();

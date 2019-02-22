@@ -30,22 +30,9 @@ class Bootstrap implements ServiceProviderInterface
 {
     public function getFactories(): array
     {
-        $services = new \ArrayObject([
-            'settings' => function (CI $c): Collection {
-                $slimDefaultSettings = [
-                    'httpVersion' => '1.1',
-                    'responseChunkSize' => 4096,
-                    'outputBuffering' => 'append',
-                    'determineRouteBeforeAppMiddleware' => false,
-                    'displayErrorDetails' => false,
-                    'addContentLengthHeader' => true,
-                    'routerCacheFile' => false,
-                ];
-                $settings = require __DIR__ . '/../config/settings.php';
-                return new Collection(array_merge($slimDefaultSettings, $settings));
-            },
-            'app' => function (CI $c): App {
-                return new App($c);
+        return [
+            'settings' => function (CI $c): array {
+                return require __DIR__ . '/../config/settings.php';
             },
             'callableResolver' => function (CI $c): CallableResolverInterface {
                 return new Psr15CallableResolver($c);
@@ -108,12 +95,7 @@ class Bootstrap implements ServiceProviderInterface
             'handler.start' => function (CI $c): RequestHandler {
                 return new Handler\Generic\FileContents(__DIR__ . '/../templates/index.html');
             },
-        ]);
-
-        (new \Slim\DefaultServicesProvider)->register($services);
-
-        // Should bnf/di support \ArrayAcces in service providers?
-        return $services->getArrayCopy();
+        ];
     }
 
     public function getExtensions(): array
@@ -121,7 +103,7 @@ class Bootstrap implements ServiceProviderInterface
         return [
             /* This is just to demonstrate the 'extensions' function,
              * we could do the same in the app factory. */
-            'app' => function (CI $c, App $app): App {
+            App::class => function (CI $c, App $app): App {
                 $this->addMiddleware($app);
                 $this->addRoutes($app);
 

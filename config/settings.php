@@ -1,6 +1,6 @@
 <?php
 return [
-    'displayErrorDetails' => PHP_SAPI == 'cli-server', // set to false in production
+    'displayErrorDetails' => PHP_SAPI === 'cli-server', // set to false in production
     'addContentLengthHeader' => false, // Allow the web server to send the content-length header
 
     /* As far as i can see output buffering is pure convenience in slim:
@@ -8,7 +8,7 @@ return [
      * let's disable it */
     'outputBuffering' => false,
 
-    'routerCacheFile' => __DIR__ . '/../var/cache/router-cache',
+    'routerCacheFile' => PHP_SAPI === 'cli-server' ? false : __DIR__ . '/../var/cache/router-cache',
 
     'db' => [
         'host' => getenv('DB_HOST'),

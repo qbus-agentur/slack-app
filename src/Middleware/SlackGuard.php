@@ -56,12 +56,14 @@ class SlackGuard implements MiddlewareInterface
             throw new \Exception('Invalid request, slack signature is wrong');
         }
 
+        /*
         $this->logger->debug('guard: request passed', [
             'target' => $request->getRequestTarget(),
             'method' => $request->getMethod(),
             'query' => $request->getQueryParams(),
             'body' => $request->getParsedBody(),
         ]);
+         */
 
         return $handler->handle($request);
     }

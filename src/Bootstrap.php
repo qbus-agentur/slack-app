@@ -76,8 +76,9 @@ class Bootstrap implements ServiceProviderInterface
                     $c->get(LoggerInterface::class)
                 );
             },
+
             Handler\Event::class => function (CI $c): RequestHandler {
-                return new Handler\Event($c->get(LoggerInterface::class));
+                return new Handler\Event($c, $c->get(LoggerInterface::class));
             },
             Handler\Command::class => function (CI $c): RequestHandler {
                 return new Handler\Command;
@@ -85,7 +86,6 @@ class Bootstrap implements ServiceProviderInterface
             Handler\Interaction::class => function (CI $c): RequestHandler {
                 return new Handler\Interaction;
             },
-
             Handler\Oauth\Start::class => function (CI $c): RequestHandler {
                 return new Handler\Oauth\Start;
             },
@@ -94,6 +94,23 @@ class Bootstrap implements ServiceProviderInterface
             },
             'handler.start' => function (CI $c): RequestHandler {
                 return new Handler\Generic\FileContents(__DIR__ . '/../templates/index.html');
+            },
+
+            Service\Client\Slack::class => function (CI $c): Service\Client\Slack {
+                return new Service\Client\Slack($c->get('db'), $c->get(LoggerInterface::class));
+            },
+
+            'slack.event:message' => function (CI $c): Event\EventHandlerInterface {
+                return new Event\Message(
+                    $c->get(Service\Client\Slack::class),
+                    $c->get(LoggerInterface::class)
+                );
+            },
+            'slack.event:link_shared' => function (CI $c): Event\EventHandlerInterface {
+                return new Event\LinkShared(
+                    $c->get(Service\Client\Slack::class),
+                    $c->get(LoggerInterface::class)
+                );
             },
         ];
     }

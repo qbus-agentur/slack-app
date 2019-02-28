@@ -6,3 +6,5 @@
 /.env
 
 /.deploy
+
+/public/active-collab_light.png

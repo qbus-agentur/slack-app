@@ -147,6 +147,7 @@ class LinkShared implements EventHandlerInterface
                 $this->escape(getenv('ACTIVECOLLAB_URL') . 'projects/' . $project),
                 $this->escape($res['project'])
             ),
+            'footer_icon' => getenv('ROOT_URL') . 'active-collab_light.png',
             'mrkdwn' => true,
             'text' => $markdown,
         ];

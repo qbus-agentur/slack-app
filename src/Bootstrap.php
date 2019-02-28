@@ -51,6 +51,12 @@ class Bootstrap implements ServiceProviderInterface
 
                 return new Database($dsn, $settings['user'], $settings['pass']);
             },
+            'acdb' => function (CI $c): Database {
+                $settings = $c->get('settings')['acdb'];
+                $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8', $settings['host'], $settings['name']);
+
+                return new Database($dsn, $settings['user'], $settings['pass']);
+            },
             LoggerInterface::class => function (CI $c): LoggerInterface {
                 $settings = $c->get('settings')['log'];
                 $logger = new \Monolog\Logger($settings['name']);
@@ -109,6 +115,7 @@ class Bootstrap implements ServiceProviderInterface
             'slack.event:link_shared' => function (CI $c): Event\EventHandlerInterface {
                 return new Event\LinkShared(
                     $c->get(Service\Client\Slack::class),
+                    $c->get('acdb'),
                     $c->get(LoggerInterface::class)
                 );
             },

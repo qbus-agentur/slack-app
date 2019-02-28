@@ -11,6 +11,10 @@ parameters:
     # This is a wrong annotation in slim/pdo
     - '#Parameter .2 .operator of method Slim.PDO.Statement.StatementContainer::where.. expects null, string given.#'
     - '#Parameter .3 .value of method Slim.PDO.Statement.StatementContainer::where.. expects null, string given.#'
+    - '#Parameter .3 .operator of method Slim.PDO.Statement.SelectStatement::join.. expects null, string given.#'
+    - '#Parameter .3 .value of method Slim.PDO.Statement.StatementContainer::where.. expects null, int given.#'
+    - '#Parameter .4 .second of method Slim.PDO.Statement.SelectStatement::join.. expects null, string given.#'
+
 
     # This is a wrong annotation in slim/slim
     - '#Return type .string. of method .*::renderHtmlNotFoundOutput.. should be compatible with return type .Psr.Http.Message.ResponseInterface. of method Slim.Handlers.NotFound::renderHtmlNotFoundOutput()#'

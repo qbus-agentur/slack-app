@@ -17,6 +17,13 @@ return [
         'pass' => getenv('DB_PASS'),
     ],
 
+    'acdb' => [
+        'host' => getenv('ACTIVECOLLAB_DB_HOST'),
+        'name' => getenv('ACTIVECOLLAB_DB_NAME'),
+        'user' => getenv('ACTIVECOLLAB_DB_USER'),
+        'pass' => getenv('ACTIVECOLLAB_DB_PASS'),
+    ],
+
     // Monolog settings
     'log' => [
         'name' => 'qbus/slack-app',

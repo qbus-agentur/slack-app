@@ -69,6 +69,7 @@ class LinkShared implements EventHandlerInterface
             if ($count > 1) {
                 foreach ($message->unfurls as $url => $preview) {
                     unset($message->unfurls[$url]['text']);
+                    unset($message->unfurls[$url]['fields']);
                 }
             }
 
@@ -119,9 +120,17 @@ class LinkShared implements EventHandlerInterface
         }
 
         $st = $this->acdb
-            ->select(['project_objects.name AS name', 'project_objects.body AS body', 'projects.name AS project'])
+            ->select([
+                'project_objects.name AS name',
+                'project_objects.body AS body',
+                'project_objects.created_by_name as creator',
+                'project_objects.due_on AS timelimit',
+                'users.first_name AS assignee',
+                'projects.name AS project',
+            ])
             ->from('project_objects')
             ->join('projects', 'project_objects.project_id', '=', 'projects.id')
+            ->leftJoin('users', 'project_objects.assignee_id', '=', 'users.id')
             ->where('projects.slug', '=', $project)
             ->where('project_objects.integer_field_1', '=', $task)
             ->where('project_objects.type', '=', 'Task');
@@ -139,9 +148,33 @@ class LinkShared implements EventHandlerInterface
 
         $markdown = $converter->convert($res['body'] ?? '');
 
+        $fields = [];
+        $assignee = $res['assignee'] ?? '';
+        if ($assignee !== '') {
+            $fields[] = [
+                'title' => 'Verantwortlich',
+                'value' => $assignee,
+                'short' => true
+            ];
+        }
+
+        $timelimit = $res['timelimit'] ?? '';
+        if ($timelimit !== '') {
+            $fields[] = [
+                'title' => 'Zeitlimit',
+                'value' => sprintf(
+                    '<!date^%s^{date_short_pretty}|%s>',
+                    (new \DateTime($timelimit))->format('U'),
+                    $timelimit
+                ),
+                'short' => true
+            ];
+        }
+
         return [
             'title' => $this->escape($res['name']),
             'title_link' => $this->escape($url),
+            'author_name' => $this->escape($res['creator']),
             'footer' => sprintf(
                 '<%s|%s>',
                 $this->escape(getenv('ACTIVECOLLAB_URL') . 'projects/' . $project),
@@ -150,6 +183,7 @@ class LinkShared implements EventHandlerInterface
             'footer_icon' => getenv('ROOT_URL') . 'active-collab_light.png',
             'mrkdwn' => true,
             'text' => $markdown,
+            'fields' => $fields,
         ];
     }
 

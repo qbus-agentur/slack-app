@@ -14,6 +14,10 @@ parameters:
     - '#Parameter .3 .operator of method Slim.PDO.Statement.SelectStatement::join.. expects null, string given.#'
     - '#Parameter .3 .value of method Slim.PDO.Statement.StatementContainer::where.. expects null, int given.#'
     - '#Parameter .4 .second of method Slim.PDO.Statement.SelectStatement::join.. expects null, string given.#'
+    - '#Parameter .3 .operator of method Slim.PDO.Statement.SelectStatement::leftJoin.. expects null, string given.#'
+    - '#Parameter .4 .second of method Slim.PDO.Statement.SelectStatement::leftJoin.. expects null, string given.#'
+    #- '#Parameter .3 .operator of method Slim.PDO.Statement.SelectStatement::rightJoin.. expects null, string given.#'
+    #- '#Parameter .4 .second of method Slim.PDO.Statement.SelectStatement::rightJoin.. expects null, string given.#'
 
 
     # This is a wrong annotation in slim/slim

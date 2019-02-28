@@ -140,7 +140,8 @@ class LinkShared implements EventHandlerInterface
         $markdown = $converter->convert($res['body'] ?? '');
 
         return [
-            'title' => sprintf('<%s|%s>', $this->escape($url), $this->escape($res['name'])),
+            'title' => $this->escape($res['name']),
+            'title_link' => $this->escape($url),
             'footer' => sprintf(
                 '<%s|%s>',
                 $this->escape(getenv('ACTIVECOLLAB_URL') . 'projects/' . $project),

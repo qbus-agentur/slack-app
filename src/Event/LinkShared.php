@@ -64,7 +64,14 @@ class LinkShared implements EventHandlerInterface
             }
         }
 
-        if (count($message->unfurls) > 0) {
+        $count = count($message->unfurls);
+        if ($count > 0) {
+            if ($count > 1) {
+                foreach ($message->unfurls as $url => $preview) {
+                    unset($message->unfurls[$url]['text']);
+                }
+            }
+
             $this->slack->req($team, 'chat.unfurl', ['json' => (array) $message]);
         }
     }

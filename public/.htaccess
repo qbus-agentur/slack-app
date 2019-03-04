@@ -1,22 +1,4 @@
-<If "%{HTTP_HOST} == 'qbus.de'">
-FcgidWrapper "/home/httpd/cgi-bin/php72-fcgi-starter.fcgi" .php
-Action application/x-httpd-php72 /cgi-sys/php72-fcgi-starter.fcgi
-AddType application/x-httpd-php72 .php
-php_value upload_max_filesize 32000000KB
-php_value post_max_size 32000000KB
-php_value apc.shm_size 100M
-php_value max_input_vars 1500
-php_value always_populate_raw_post_data -1
-php_value allow_url_fopen 1
-php_flag log_errors on
-php_value error_log /usr/home/qbusio/PHP72_errors.log
-</If>
-
 RewriteEngine On
-
-RewriteCond %{HTTP_HOST} =slack.qbus.io
-RewriteCond %{HTTPS} off
-RewriteRule ^ https://slack.qbus.io%{REQUEST_URI} [R=303,L]
 
 RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 

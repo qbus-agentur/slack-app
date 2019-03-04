@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp\Event;
 
+use DateTime;
 use League\HTMLToMarkdown\HtmlConverter;
 use Psr\Log\LoggerInterface;
 use Slim\PDO\Database;
@@ -79,6 +80,29 @@ class LinkShared implements EventHandlerInterface
 
     private function previewLink(string $url): ?array
     {
+        $parsed = $this->parseLink($url);
+        if ($parsed === null) {
+            return null;
+        }
+        $slug = $parsed['project'];
+        $task = $parsed['task'];
+
+        $res = $this->findProject($slug, $task);
+
+        return $this->createUnfurlMessage(
+            $url,
+            $res['name'] ?? '',
+            $res['body'] ?? '',
+            $res['assignee'] ?? '',
+            $res['creator'] ?? '',
+            $slug,
+            $res['project'] ?? '',
+            ($res['timelimit'] ?? '') === '' ? null : new DateTime($res['timelimit'])
+        );
+    }
+
+    private function parseLink(string $url): ?array
+    {
         $parsed = parse_url($url);
         if ($parsed === false) {
             return null;
@@ -119,6 +143,14 @@ class LinkShared implements EventHandlerInterface
             return null;
         }
 
+        return [
+            'project' => $project,
+            'task' => $task
+        ];
+    }
+
+    private function findProject(string $slug, int $task): ?array
+    {
         $st = $this->acdb
             ->select([
                 'project_objects.name AS name',
@@ -131,7 +163,7 @@ class LinkShared implements EventHandlerInterface
             ->from('project_objects')
             ->join('projects', 'project_objects.project_id', '=', 'projects.id')
             ->leftJoin('users', 'project_objects.assignee_id', '=', 'users.id')
-            ->where('projects.slug', '=', $project)
+            ->where('projects.slug', '=', $slug)
             ->where('project_objects.integer_field_1', '=', $task)
             ->where('project_objects.type', '=', 'Task');
         $stmt = $st->execute();
@@ -141,15 +173,27 @@ class LinkShared implements EventHandlerInterface
             return null;
         }
 
+        return $res;
+    }
+
+    private function createUnfurlMessage(
+        string $url,
+        string $name,
+        string $body,
+        string $assignee,
+        string $creator,
+        string $slug,
+        string $project,
+        ?DateTime $timelimit
+    ): array {
         $converter = new HtmlConverter();
         $converter->getConfig()->setOption('strip_tags', true);
         $converter->getConfig()->setOption('italic_style', '_');
         $converter->getConfig()->setOption('bold_style', '*');
 
-        $markdown = $converter->convert($res['body'] ?? '');
+        $markdown = $converter->convert($body);
 
         $fields = [];
-        $assignee = $res['assignee'] ?? '';
         if ($assignee !== '') {
             $fields[] = [
                 'title' => 'Verantwortlich',
@@ -158,27 +202,26 @@ class LinkShared implements EventHandlerInterface
             ];
         }
 
-        $timelimit = $res['timelimit'] ?? '';
-        if ($timelimit !== '') {
+        if ($timelimit !== null) {
             $fields[] = [
                 'title' => 'Zeitlimit',
                 'value' => sprintf(
                     '<!date^%s^{date_short_pretty}|%s>',
-                    (new \DateTime($timelimit))->format('U'),
-                    $timelimit
+                    $timelimit->format('U'),
+                    $timelimit->format('d.m.Y')
                 ),
                 'short' => true
             ];
         }
 
         return [
-            'title' => $this->escape($res['name']),
+            'title' => $this->escape($name),
             'title_link' => $this->escape($url),
-            'author_name' => $this->escape($res['creator']),
+            'author_name' => $this->escape($creator),
             'footer' => sprintf(
                 '<%s|%s>',
-                $this->escape(getenv('ACTIVECOLLAB_URL') . 'projects/' . $project),
-                $this->escape($res['project'])
+                $this->escape(getenv('ACTIVECOLLAB_URL') . 'projects/' . $slug),
+                $this->escape($project)
             ),
             'footer_icon' => getenv('ROOT_URL') . 'active-collab_light.png',
             'mrkdwn' => true,

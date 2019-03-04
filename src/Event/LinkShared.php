@@ -95,7 +95,7 @@ class LinkShared implements EventHandlerInterface
 
         $query = $parsed['query'] ?? '';
 
-        $arguments = '';
+        $arguments = [];
         parse_str($query, $arguments);
 
         $path_info = $arguments['path_info'] ?? '';

@@ -6,6 +6,7 @@ use DateTime;
 use League\HTMLToMarkdown\HtmlConverter;
 use Psr\Log\LoggerInterface;
 use Slim\PDO\Database;
+use stdClass;
 use Qbus\SlackApp\Service\Client\Slack;
 
 /**
@@ -34,19 +35,17 @@ class LinkShared implements EventHandlerInterface
 
     public function handle(\stdClass $payload): void
     {
-        // @todo compare token
-        //$token = $payload->token ?? '';
         $team = $payload->team_id ?? '';
 
-        $event = $payload->event ?? null;
-        if ($event === null) {
+        if (!isset($payload->event)) {
             return;
         }
+        $event = $payload->event;
 
         $channel = $event->channel ?? '';
         $timestamp = $event->message_ts ?? '';
 
-        $message = new \stdClass;
+        $message = new stdClass;
         $message->channel = $channel;
         $message->ts = $timestamp;
         $message->unfurls = [];
@@ -54,10 +53,10 @@ class LinkShared implements EventHandlerInterface
         $this->logger->debug('Received link_shared', ['payload' => $payload, 'team' => $team]);
 
         foreach ($event->links ?? [] as $link) {
-            $url = $link->url ?? null;
-            if ($url === null) {
+            if (!isset($link->url)) {
                 continue;
             }
+            $url = $link->url;
 
             $preview = $this->previewLink($url);
             if (is_array($preview)) {

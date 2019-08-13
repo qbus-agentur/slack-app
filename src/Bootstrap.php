@@ -2,7 +2,6 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp;
 
-use Bnf\Slim3Psr15\CallableResolver as Psr15CallableResolver;
 use Interop\Container\ServiceProviderInterface;
 use Psr\Container\ContainerInterface as CI;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -12,8 +11,8 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
 use Slim\App;
 use Slim\Collection;
-use Slim\Interfaces\CallableResolverInterface;
-use Slim\Interfaces\RouterInterface;
+use Slim\Interfaces\DispatcherInterface;
+use Slim\Interfaces\RouteCollectorInterface;
 use Slim\PDO\Database;
 
 /**
@@ -34,16 +33,16 @@ class Bootstrap implements ServiceProviderInterface
             'settings' => function (CI $c): array {
                 return require __DIR__ . '/../config/settings.php';
             },
-            'callableResolver' => function (CI $c): CallableResolverInterface {
-                return new Psr15CallableResolver($c);
+            'slim.route_cache_file' => function (CI $c): ?string {
+                return $c->get('settings')['routerCacheFile'];
             },
-            'router' => function (CI $c): RouterInterface {
-                $routerCacheFile = $c->get('settings')['routerCacheFile'] ?? false;
-
-                $router = (new Router)->setCacheFile($routerCacheFile);
-                $router->setContainer($c);
-
-                return $router;
+            RouteDispatcher::class => function (CI $c): RouteDispatcher {
+                return new RouteDispatcher(
+                    $c->get(RouteCollectorInterface::class)
+                );
+            },
+            DispatcherInterface::class => function (CI $c): DispatcherInterface {
+                return $c->get(RouteDispatcher::class);
             },
             'db' => function (CI $c): Database {
                 $settings = $c->get('settings')['db'];
@@ -128,6 +127,8 @@ class Bootstrap implements ServiceProviderInterface
             /* This is just to demonstrate the 'extensions' function,
              * we could do the same in the app factory. */
             App::class => function (CI $c, App $app): App {
+                $app->addErrorMiddleware(false, true, true);
+
                 $this->addMiddleware($app);
                 $this->addRoutes($app);
 

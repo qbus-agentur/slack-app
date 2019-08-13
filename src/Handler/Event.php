@@ -10,7 +10,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Qbus\SlackApp\Event\EventHandlerInterface;
 use Qbus\SlackApp\Http\JsonResponse;
-use Slim\Http\Response;
+use Slim\Psr7\Response;
 
 /**
  * Event

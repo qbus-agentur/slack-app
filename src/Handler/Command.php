@@ -6,8 +6,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Qbus\SlackApp\Http\JsonResponse;
-use Slim\Http\Response;
-use Slim\Http\Headers;
+use Slim\Psr7\Response;
+use Slim\Psr7\Headers;
 
 /**
  * Command

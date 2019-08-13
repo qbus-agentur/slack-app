@@ -8,5 +8,5 @@
     $container->get(\Slim\App::class);
 
     // warmup caches
-    $container->get('router')->warmupCaches();
+    $container->get(\Qbus\SlackApp\RouteDispatcher::class)->warmupCaches();
 })();

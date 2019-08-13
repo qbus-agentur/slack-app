@@ -5,9 +5,9 @@ namespace Qbus\SlackApp\Http;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Http\Body;
-use Slim\Http\Headers;
-use Slim\Http\Response;
+use Slim\Psr7\Headers;
+use Slim\Psr7\Factory\StreamFactory;
+use Slim\Psr7\Response;
 
 /**
  * JsonResponse
@@ -35,13 +35,7 @@ class JsonResponse extends Response
             throw new \InvalidArgumentException('Unable to encode data to JSON: ' . json_last_error_msg());
         }
 
-        $resource = fopen('php://temp', 'wb+');
-        if ($resource === false) {
-            throw new \RuntimeException('Failed to create temporary resource');
-        }
-        $body = new Body($resource);
-        $body->write($json);
-
+        $body = (new StreamFactory())->createStream($json);
         $headers = new Headers($headers + ['Content-Type' => 'application/json; charset=utf-8']);
 
         parent::__construct($status, $headers, $body);

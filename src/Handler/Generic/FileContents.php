@@ -5,8 +5,8 @@ namespace Qbus\SlackApp\Handler\Generic;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Http\Response;
-use Slim\Http\Body;
+use Slim\Psr7\Response;
+use Slim\Psr7\Factory\StreamFactory;
 
 /**
  * Serve contents of a file
@@ -26,11 +26,7 @@ class FileContents implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $file = fopen($this->filename, 'r');
-        if ($file === false) {
-            throw new \Exception('Failed to open ' . $this->filename . '.');
-        }
-
-        return new Response(200, null, new Body($file));
+        $body = (new StreamFactory)->createStreamFromFile($this->filename);
+        return new Response(200, null, $body);
     }
 }

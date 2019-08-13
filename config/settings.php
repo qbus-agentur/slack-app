@@ -8,7 +8,7 @@ return [
      * let's disable it */
     'outputBuffering' => false,
 
-    'routerCacheFile' => PHP_SAPI === 'cli-server' ? false : __DIR__ . '/../var/cache/router-cache',
+    'routerCacheFile' => PHP_SAPI === 'cli-server' ? null : __DIR__ . '/../var/cache/router-cache',
 
     'db' => [
         'host' => getenv('DB_HOST'),

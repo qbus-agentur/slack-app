@@ -9,5 +9,6 @@ $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS', 'ACTIVECOLLAB_SAL
 
 return new \Bnf\Di\Container([
     new \Bnf\SlimInterop\ServiceProvider,
+    new \Bnf\ZendDiactoros\ServiceProvider,
     new \Qbus\SlackApp\Bootstrap,
 ]);

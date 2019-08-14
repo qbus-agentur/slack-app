@@ -22,8 +22,6 @@
         "bnf/slim-interop-service-provider": "^4.2",
         "guzzlehttp/guzzle": "^6.3",
         "league/html-to-markdown": "^4.8",
-        "nyholm/psr7": "^1.1",
-        "nyholm/psr7-server": "^0.3.0",
         "slim/psr7": "^0.4.0"
     },
     "autoload": {

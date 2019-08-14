@@ -5,8 +5,7 @@ namespace Qbus\SlackApp\Handler\Oauth;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Psr7\Response;
-use Slim\Psr7\Headers;
+use Zend\Diactoros\Response;
 
 /**
  * Start oauth procedure
@@ -35,6 +34,6 @@ class Start implements RequestHandlerInterface
             $state
         );
 
-        return new Response(302, new Headers(['Location' => $url]));
+        return new Response('php://memory', 302, ['Location' => $url]);
     }
 }

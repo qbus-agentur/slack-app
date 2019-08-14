@@ -10,7 +10,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Qbus\SlackApp\Event\EventHandlerInterface;
 use Qbus\SlackApp\Http\JsonResponse;
-use Slim\Psr7\Response;
+use Zend\Diactoros\Response;
 
 /**
  * Event
@@ -56,7 +56,7 @@ class Event implements RequestHandlerInterface
             return $this->eventCallback($data);
         }
 
-        return new Response(400);
+        return new Response('php://memory', 400);
     }
 
     private function eventCallback(\stdClass $data): ResponseInterface
@@ -71,7 +71,7 @@ class Event implements RequestHandlerInterface
             $handler = $this->container->get($service);
         } catch (NotFoundExceptionInterface $e) {
             // @todo log invalid request
-            return new Response(400);
+            return new Response('php://memory', 400);
         }
 
         if ($handler instanceof EventHandlerInterface) {

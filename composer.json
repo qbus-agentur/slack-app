@@ -22,7 +22,7 @@
         "bnf/slim-interop-service-provider": "^4.2",
         "guzzlehttp/guzzle": "^6.3",
         "league/html-to-markdown": "^4.8",
-        "slim/psr7": "^0.4.0"
+        "zendframework/zend-diactoros": "^2.1"
     },
     "autoload": {
         "psr-4": {

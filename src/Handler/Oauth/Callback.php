@@ -5,8 +5,7 @@ namespace Qbus\SlackApp\Handler\Oauth;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Psr7\Response;
-use Slim\Psr7\Headers;
+use Zend\Diactoros\Response;
 use Slim\PDO\Database;
 
 /**
@@ -33,7 +32,7 @@ class Callback implements RequestHandlerInterface
 
         $state = $params['state'] ?? '';
         if ($_SESSION['state_token'] !== $state) {
-            $response = new Response(401);
+            $response = new Response('php://memory', 401);
             $response->getBody()->write('Invalid state parameter');
             return $response;
         }
@@ -93,7 +92,7 @@ class Callback implements RequestHandlerInterface
                     ->execute();
             }
         } else {
-            $response = new Response(400);
+            $response = new Response('php://memory', 400);
             $response->getBody()->write('Failed.');
             return $response;
         }
@@ -105,6 +104,6 @@ class Callback implements RequestHandlerInterface
             $team_id
         );
 
-        return new Response(302, new Headers(['Location' => $url]));
+        return new Response('php://memory', 302, ['Location' => $url]);
     }
 }

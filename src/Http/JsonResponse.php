@@ -5,9 +5,8 @@ namespace Qbus\SlackApp\Http;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Psr7\Headers;
-use Slim\Psr7\Factory\StreamFactory;
-use Slim\Psr7\Response;
+use Zend\Diactoros\StreamFactory;
+use Zend\Diactoros\Response;
 
 /**
  * JsonResponse
@@ -36,8 +35,8 @@ class JsonResponse extends Response
         }
 
         $body = (new StreamFactory())->createStream($json);
-        $headers = new Headers($headers + ['Content-Type' => 'application/json; charset=utf-8']);
+        $headers += ['Content-Type' => 'application/json; charset=utf-8'];
 
-        parent::__construct($status, $headers, $body);
+        parent::__construct($body, $status, $headers);
     }
 }

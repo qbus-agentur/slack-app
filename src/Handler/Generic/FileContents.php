@@ -5,8 +5,8 @@ namespace Qbus\SlackApp\Handler\Generic;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Psr7\Response;
-use Slim\Psr7\Factory\StreamFactory;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\StreamFactory;
 
 /**
  * Serve contents of a file
@@ -27,6 +27,6 @@ class FileContents implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $body = (new StreamFactory)->createStreamFromFile($this->filename);
-        return new Response(200, null, $body);
+        return new Response($body);
     }
 }

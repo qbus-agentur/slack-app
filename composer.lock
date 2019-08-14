@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "591321daca65955dbce6a7761313b6c3",
+    "content-hash": "ec3681ff620ca9c1cb42f2ac4d146e0b",
     "packages": [
         {
             "name": "bnf/di",
@@ -66,16 +66,16 @@
         },
         {
             "name": "bnf/slim-interop-service-provider",
-            "version": "4.1.1",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bnf/slim-interop-service-provider.git",
-                "reference": "d50da9bae2e740b0a9640c7fb8f6f46a805ec428"
+                "reference": "552ed7416e01171f6c03154eaf012ec9ece74f42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bnf/slim-interop-service-provider/zipball/d50da9bae2e740b0a9640c7fb8f6f46a805ec428",
-                "reference": "d50da9bae2e740b0a9640c7fb8f6f46a805ec428",
+                "url": "https://api.github.com/repos/bnf/slim-interop-service-provider/zipball/552ed7416e01171f6c03154eaf012ec9ece74f42",
+                "reference": "552ed7416e01171f6c03154eaf012ec9ece74f42",
                 "shasum": ""
             },
             "require": {
@@ -115,7 +115,7 @@
                 "PSR-11",
                 "service-provider"
             ],
-            "time": "2019-08-13T19:40:02+00:00"
+            "time": "2019-08-14T08:04:37+00:00"
         },
         {
             "name": "container-interop/service-provider",

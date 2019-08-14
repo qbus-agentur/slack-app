@@ -13,6 +13,8 @@ use Slim\App;
 use Slim\Collection;
 use Slim\Interfaces\DispatcherInterface;
 use Slim\Interfaces\RouteCollectorInterface;
+use Slim\Handlers\ErrorHandler;
+use Slim\Middleware\ErrorMiddleware;
 use Slim\PDO\Database;
 
 /**
@@ -35,6 +37,12 @@ class Bootstrap implements ServiceProviderInterface
             },
             'slim.route_cache_file' => function (CI $c): ?string {
                 return $c->get('settings')['routerCacheFile'];
+            },
+            'slim.display_error_details' => function (CI $c): bool {
+                return $c->get('settings')['displayErrorDetails'];
+            },
+            'slim.log_errors' => function (CI $c): bool {
+                return $c->get('settings')['displayErrorDetails'];
             },
             RouteDispatcher::class => function (CI $c): RouteDispatcher {
                 return new RouteDispatcher(
@@ -65,21 +73,6 @@ class Bootstrap implements ServiceProviderInterface
             },
             'guard' => function (CI $c): MiddlewareInterface {
                 return new Middleware\SlackGuard($c->get(LoggerInterface::class));
-            },
-            'notFoundHandler' => function (CI $c): callable {
-                return new Handler\Error\NotFound;
-            },
-            'erorHandler' => function (CI $c): callable {
-                return new Handler\Error\Error(
-                    $c->get('settings')['displayErrorDetails'],
-                    $c->get(LoggerInterface::class)
-                );
-            },
-            'phpErrorHandler' => function (CI $c): callable {
-                return new Handler\Error\PhpError(
-                    $c->get('settings')['displayErrorDetails'],
-                    $c->get(LoggerInterface::class)
-                );
             },
 
             Handler\Event::class => function (CI $c): RequestHandler {
@@ -127,8 +120,6 @@ class Bootstrap implements ServiceProviderInterface
             /* This is just to demonstrate the 'extensions' function,
              * we could do the same in the app factory. */
             App::class => function (CI $c, App $app): App {
-                $app->addErrorMiddleware(false, true, true);
-
                 $this->addMiddleware($app);
                 $this->addRoutes($app);
 
@@ -136,11 +127,17 @@ class Bootstrap implements ServiceProviderInterface
 
                 return $app;
             },
+            ErrorHandler::class => function (CI $c, ErrorHandler $errorHandler): ErrorHandler {
+                $errorHandler->setDefaultErrorRenderer('text/html', Handler\Error\HtmlErrorHandler::class);
+                $errorHandler->registerErrorRenderer('text/html', Handler\Error\HtmlErrorHandler::class);
+                return $errorHandler;
+            },
         ];
     }
 
     protected function addMiddleware(App $app): void
     {
+        $app->add(ErrorMiddleware::class);
     }
 
     protected function addRoutes(App $app): void

@@ -19,7 +19,7 @@
         "monolog/monolog": "^1.22",
         "vlucas/phpdotenv": "^2.4",
         "bnf/di": "^0.1.2",
-        "bnf/slim-interop-service-provider": "^4.1.1",
+        "bnf/slim-interop-service-provider": "^4.2",
         "guzzlehttp/guzzle": "^6.3",
         "league/html-to-markdown": "^4.8",
         "nyholm/psr7": "^1.1",

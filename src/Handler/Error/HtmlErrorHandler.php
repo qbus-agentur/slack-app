@@ -37,7 +37,7 @@ class HtmlErrorHandler extends HtmlErrorRenderer
         $format = <<<EOT
 <html>
    <head>
-       <meta http-equiv='Content-Typeontent='text/html; charset=utf-8'>" .
+       <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
        <title>%s</title>
        <style>
            body{margin:0;padding:1em;font:1em/1.5 Helvetica,Arial,Verdana,sans-serif}

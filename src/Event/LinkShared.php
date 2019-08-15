@@ -129,17 +129,14 @@ class LinkShared implements EventHandlerInterface
 
         $paths = explode('/', $path_info);
 
-        if ($paths[0] !== 'projects') {
+        if ($paths[0] !== 'projects' || !isset($paths[1]) || !isset($paths[2]) || $paths[2] !== 'tasks') {
             return null;
         }
 
-        $project = $paths[1] ?? '';
-        $task = null;
-        if (($paths[2] ?? '') === 'tasks' && isset($paths[3])) {
-            $task = (int) $paths[3];
-        }
+        $project = $paths[1];
+        $task = (int) $paths[3];
 
-        if ($task === null || $task === 0) {
+        if ($task === 0) {
             return null;
         }
 

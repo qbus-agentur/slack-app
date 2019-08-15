@@ -48,6 +48,9 @@ class Event implements RequestHandlerInterface
 
             $token = $data->token ?? '';
             $this->logger->notice('Recieved new url_verification', ['data' => $data]);
+            // @todo: this token is deprecated and it seems we never need this
+            // (was intended to be used for verification of the origin, but our SlackGuard actually does that)
+            // see https://api.slack.com/events-api#request_url_configuration__amp__verification
             file_put_contents(__DIR__ . '/../../token', $token);
             return new JsonResponse($res);
         }

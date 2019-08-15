@@ -33,14 +33,18 @@ class Bootstrap implements ServiceProviderInterface
     public function getFactories(): array
     {
         return [
-            'settings' => function (CI $c): array {
-                return require __DIR__ . '/../config/settings.php';
+            Config::class => function (): Config {
+                $config = parse_ini_file(__DIR__ . '/../app.conf', true, INI_SCANNER_RAW);
+                if ($config === false) {
+                    throw new \RuntimeException('Invalid configuration file');
+                }
+                return new Config\Config($config);
             },
             'slim.route_cache_file' => function (CI $c): ?string {
-                return $c->get('settings')['routerCacheFile'];
+                return PHP_SAPI === 'cli-server' ? null : __DIR__ . '/../var/cache/router-cache';
             },
             'slim.display_error_details' => function (CI $c): bool {
-                return $c->get('settings')['displayErrorDetails'];
+                return PHP_SAPI === 'cli-server'; // set to false in production
             },
             'slim.log_errors' => function (): bool {
                 return true;
@@ -57,22 +61,23 @@ class Bootstrap implements ServiceProviderInterface
                 return $c->get(RouteDispatcher::class);
             },
             'db' => function (CI $c): Database {
-                $settings = $c->get('settings')['db'];
-                $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8', $settings['host'], $settings['name']);
+                $config = $c->get(Config::class)->database();
+                $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8', $config->host(), $config->name());
 
-                return new Database($dsn, $settings['user'], $settings['pass']);
+                return new Database($dsn, $config->user(), $config->pass());
             },
             'acdb' => function (CI $c): Database {
-                $settings = $c->get('settings')['acdb'];
-                $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8', $settings['host'], $settings['name']);
+                $config = $c->get(Config::class)->activeCollab()->database();
+                $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8', $config->host(), $config->name());
 
-                return new Database($dsn, $settings['user'], $settings['pass']);
+                return new Database($dsn, $config->user(), $config->pass());
             },
             LoggerInterface::class => function (CI $c): LoggerInterface {
-                $settings = $c->get('settings')['log'];
-                $logger = new \Monolog\Logger($settings['name']);
+                $path = __DIR__ . '/../var/log/app.log';
+                $level = \Monolog\Logger::DEBUG;
+                $logger = new \Monolog\Logger('qbus/slack-app');
                 $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
-                $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
+                $logger->pushHandler(new \Monolog\Handler\StreamHandler($path, $level));
                 return $logger;
             },
             ClientInterface::class => function (CI $c): ClientInterface {
@@ -83,7 +88,12 @@ class Bootstrap implements ServiceProviderInterface
                 );
             },
             'guard' => function (CI $c): MiddlewareInterface {
-                return new Middleware\SlackGuard($c->get(LoggerInterface::class));
+                /** @var Config */
+                $config = $c->get(Config::class);
+                return new Middleware\SlackGuard(
+                    $c->get(LoggerInterface::class),
+                    $config->slack()->signingSecret()
+                );
             },
 
             Handler\Event::class => function (CI $c): RequestHandler {
@@ -95,14 +105,21 @@ class Bootstrap implements ServiceProviderInterface
             Handler\Interaction::class => function (): RequestHandler {
                 return new Handler\Interaction;
             },
-            Handler\Oauth\Start::class => function (): RequestHandler {
-                return new Handler\Oauth\Start;
+            Handler\Oauth\Start::class => function (CI $c): RequestHandler {
+                /** @var Config */
+                $config = $c->get(Config::class);
+                return new Handler\Oauth\Start(
+                    $config->slack()
+                );
             },
             Handler\Oauth\Callback::class => function (CI $c): RequestHandler {
+                /** @var Config */
+                $config = $c->get(Config::class);
                 return new Handler\Oauth\Callback(
                     $c->get(RequestFactoryInterface::class),
                     $c->get(ClientInterface::class),
-                    $c->get('db')
+                    $c->get('db'),
+                    $config->slack()
                 );
             },
             'handler.start' => function (): RequestHandler {
@@ -114,7 +131,8 @@ class Bootstrap implements ServiceProviderInterface
                     $c->get('db'),
                     $c->get(RequestFactoryInterface::class),
                     $c->get(ClientInterface::class),
-                    $c->get(LoggerInterface::class)
+                    $c->get(LoggerInterface::class),
+                    $c->get(Config::class)->slack()->rootUrl()
                 );
             },
 
@@ -125,10 +143,14 @@ class Bootstrap implements ServiceProviderInterface
                 );
             },
             'slack.event:link_shared' => function (CI $c): Event\EventHandlerInterface {
+                /** @var Config */
+                $config = $c->get(Config::class);
                 return new Event\LinkShared(
                     $c->get(Service\Client\Slack::class),
                     $c->get('acdb'),
-                    $c->get(LoggerInterface::class)
+                    $c->get(LoggerInterface::class),
+                    $config->activeCollab()->url(),
+                    $config->app()->rootUrl()
                 );
             },
         ];

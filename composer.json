@@ -29,7 +29,6 @@
         "slim/pdo": "^1.10",
         "slim/slim": "^4.0",
         "sunrise/http-client-curl": "^1.2",
-        "vlucas/phpdotenv": "^3.4",
         "zendframework/zend-diactoros": "^2.1"
     },
     "autoload": {
@@ -39,7 +38,7 @@
     },
     "scripts": {
         "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+            "@php -r \"file_exists('app.conf') || copy('app.conf.example', 'app.conf');\""
         ],
         "start": "php -S 127.0.0.1:8088 -t public public/router.php"
     },

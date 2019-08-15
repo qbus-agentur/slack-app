@@ -26,16 +26,28 @@ class LinkShared implements EventHandlerInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var string */
+    private $activeCollabUrl;
+
+    /** @var string */
+    private $rootUrl;
+
     /** @var string|null */
     private $activeCollabHost;
 
-    public function __construct(Slack $slack, Database $acdb, LoggerInterface $logger)
-    {
+    public function __construct(
+        Slack $slack,
+        Database $acdb,
+        LoggerInterface $logger,
+        string $activeCollabUrl,
+        string $rootUrl
+    ) {
         $this->slack = $slack;
         $this->acdb = $acdb;
         $this->logger = $logger;
 
-        $activeCollabUrl = getenv('ACTIVECOLLAB_URL') ?: '';
+        $this->rootUrl = $rootUrl;
+        $this->activeCollabUrl = $activeCollabUrl;
         $this->activeCollabHost = parse_url($activeCollabUrl, PHP_URL_HOST);
     }
 
@@ -217,10 +229,10 @@ class LinkShared implements EventHandlerInterface
             'author_name' => $this->escape($creator),
             'footer' => sprintf(
                 '<%s|%s>',
-                $this->escape(getenv('ACTIVECOLLAB_URL') . 'projects/' . $slug),
+                $this->escape($this->activeCollabUrl . 'projects/' . $slug),
                 $this->escape($project)
             ),
-            'footer_icon' => getenv('ROOT_URL') . 'active-collab_light.png',
+            'footer_icon' => $this->rootUrl . 'active-collab_light.png',
             'mrkdwn' => true,
             'text' => $markdown,
             'fields' => $fields,

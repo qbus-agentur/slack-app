@@ -28,16 +28,21 @@ class Slack
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var string */
+    private $slackRootUrl;
+
     public function __construct(
         Database $db,
         RequestFactoryInterface $requestFactory,
         ClientInterface $client,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        string $slackRootUrl = 'https://slack.com'
     ) {
         $this->db = $db;
         $this->requestFactory = $requestFactory;
         $this->client = $client;
         $this->logger = $logger;
+        $this->slackRootUrl = $slackRootUrl;
     }
 
     private function createRequest(string $api_url, string $token, object $payload): RequestInterface
@@ -66,7 +71,7 @@ class Slack
 
         $api_url = sprintf(
             '%s/api/%s',
-            getenv('SLACK_ROOT_URL') ?: 'https://slack.com',
+            $this->slackRootUrl,
             $method
         );
 

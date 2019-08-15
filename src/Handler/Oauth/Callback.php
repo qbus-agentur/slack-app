@@ -3,13 +3,14 @@ declare(strict_types = 1);
 namespace Qbus\SlackApp\Handler\Oauth;
 
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response;
+use Qbus\SlackApp\Config\Slack;
 use Slim\PDO\Database;
+use Zend\Diactoros\Response;
 
 /**
  * Handle oauth callback from slack
@@ -26,28 +27,31 @@ class Callback implements RequestHandlerInterface
     private $client;
 
     /** @var Database */
-    protected $db;
+    private $db;
+
+    /** @var Slack */
+    private $slack;
 
     public function __construct(
         RequestFactoryInterface $requestFactory,
         ClientInterface $client,
-        Database $db
+        Database $db,
+        Slack $slack
     ) {
         $this->requestFactory = $requestFactory;
         $this->client = $client;
         $this->db = $db;
+        $this->slack = $slack;
     }
 
     private function createAccessRequest(string $code): RequestInterface
     {
         $api_url = sprintf(
             '%s/api/oauth.access',
-            getenv('SLACK_ROOT_URL') ?: 'https://slack.com'
+            $this->slack->rootUrl()
         );
-        /** @var string */
-        $clientId = getenv('SLACK_CLIENT_ID') ?: '';
-        /** @var string */
-        $clientSecret = getenv('SLACK_CLIENT_SECRET') ?: '';
+        $clientId = $this->slack->clientId();
+        $clientSecret = $this->slack->clientSecret();
 
         $postData = ['code' => $code];
         $request = $this->requestFactory->createRequest('POST', $api_url)
@@ -118,8 +122,8 @@ class Callback implements RequestHandlerInterface
 
         $url = sprintf(
             '%s/app_redirect?app=%s&team=%s',
-            getenv('SLACK_ROOT_URL') ?: 'https://slack.com',
-            getenv('SLACK_APP_ID'),
+            $this->slack->rootUrl(),
+            $this->slack->appId(),
             $team_id
         );
 

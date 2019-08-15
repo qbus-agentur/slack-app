@@ -17,15 +17,17 @@ class SlackGuard implements MiddlewareInterface
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(LoggerInterface $logger)
+    /** @var string */
+    private $slackSigningSecret;
+
+    public function __construct(LoggerInterface $logger, string $slackSigningSecret)
     {
         $this->logger = $logger;
+        $this->slackSigningSecret = $slackSigningSecret;
     }
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        $signingSecret = (string) getenv('SLACK_SIGNING_SECRET');
-
         $timestamp = intval($request->getHeaderLine('X-Slack-Request-Timestamp'));
         $slack_signature = $request->getHeaderLine('X-Slack-Signature');
 
@@ -43,7 +45,7 @@ class SlackGuard implements MiddlewareInterface
 
         $body = (string) $request->getBody();
         $sig_basestring = implode(':', ['v0', $timestamp, $body]);
-        $computed_signature = 'v0=' . hash_hmac('sha256', $sig_basestring, $signingSecret, false);
+        $computed_signature = 'v0=' . hash_hmac('sha256', $sig_basestring, $this->slackSigningSecret, false);
         file_put_contents(
             '../logs/sign-' . date('Y-m-d_his'),
             $timestamp . "\n" . $slack_signature . "\n" . $computed_signature

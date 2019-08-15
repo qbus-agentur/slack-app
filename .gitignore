@@ -3,7 +3,7 @@
 !/var/log/.gitkeep
 /var/cache/*
 !/var/cache/.gitkeep
-/.env
+/app.conf
 
 /.deploy
 

@@ -2,9 +2,10 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp\Handler\Oauth;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Qbus\SlackApp\Config\Slack;
 use Zend\Diactoros\Response;
 
 /**
@@ -15,6 +16,14 @@ use Zend\Diactoros\Response;
  */
 class Start implements RequestHandlerInterface
 {
+    /** @var Slack */
+    private $slack;
+
+    public function __construct(Slack $slack)
+    {
+        $this->slack = $slack;
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $random = openssl_random_pseudo_bytes(1024);
@@ -28,8 +37,8 @@ class Start implements RequestHandlerInterface
 
         $url = sprintf(
             '%s/oauth/authorize?client_id=%s&scope=%s&state=%s',
-            getenv('SLACK_ROOT_URL') ?: 'https://slack.com',
-            getenv('SLACK_CLIENT_ID'),
+            $this->slack->rootUrl(),
+            $this->slack->clientId(),
             'links:read,links:write,commands,chat:write,team:read,channels:history,groups:history,im:history',
             $state
         );

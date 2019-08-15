@@ -10,6 +10,11 @@
             "homepage": "https://bnfr.net/"
         }
     ],
+    "config": {
+        "platform": {
+            "php": "7.2.20"
+        }
+    },
     "require": {
         "php": "^7.2",
         "slim/slim": "^4.0",

@@ -2,6 +2,9 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp\Handler\Oauth;
 
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -16,12 +19,43 @@ use Slim\PDO\Database;
  */
 class Callback implements RequestHandlerInterface
 {
+    /** @var RequestFactoryInterface */
+    private $requestFactory;
+
+    /** @var ClientInterface */
+    private $client;
+
     /** @var Database */
     protected $db;
 
-    public function __construct(Database $db)
-    {
+    public function __construct(
+        RequestFactoryInterface $requestFactory,
+        ClientInterface $client,
+        Database $db
+    ) {
+        $this->requestFactory = $requestFactory;
+        $this->client = $client;
         $this->db = $db;
+    }
+
+    private function createAccessRequest(string $code): RequestInterface
+    {
+        $api_url = sprintf(
+            '%s/api/oauth.access',
+            getenv('SLACK_ROOT_URL') ?: 'https://slack.com'
+        );
+        /** @var string */
+        $clientId = getenv('SLACK_CLIENT_ID') ?: '';
+        /** @var string */
+        $clientSecret = getenv('SLACK_CLIENT_SECRET') ?: '';
+
+        $postData = ['code' => $code];
+        $request = $this->requestFactory->createRequest('POST', $api_url)
+            ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+            ->withHeader('Authorization', 'Basic ' . base64_encode($clientId . ':' . $clientSecret));
+        $request->getBody()->write(http_build_query($postData, '', '&', PHP_QUERY_RFC1738));
+
+        return $request;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -37,22 +71,7 @@ class Callback implements RequestHandlerInterface
             return $response;
         }
 
-        $api_url = sprintf(
-            '%s/api/oauth.access',
-            getenv('SLACK_ROOT_URL') ?: 'https://slack.com'
-        );
-        $client = new \GuzzleHttp\Client();
-
-        $res = $client->request(
-            'POST',
-            $api_url,
-            [
-                'auth' => [getenv('SLACK_CLIENT_ID'), getenv('SLACK_CLIENT_SECRET')],
-                'form_params' => [
-                    'code' => $code,
-                ],
-            ]
-        );
+        $res = $this->client->sendRequest($this->createAccessRequest($code));
 
         if ($res->getStatusCode() === 200) {
             $data = json_decode((string) $res->getBody(), true);

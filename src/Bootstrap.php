@@ -97,7 +97,11 @@ class Bootstrap implements ServiceProviderInterface
                 return new Handler\Oauth\Start;
             },
             Handler\Oauth\Callback::class => function (CI $c): RequestHandler {
-                return new Handler\Oauth\Callback($c->get('db'));
+                return new Handler\Oauth\Callback(
+                    $c->get(RequestFactoryInterface::class),
+                    $c->get(ClientInterface::class),
+                    $c->get('db')
+                );
             },
             'handler.start' => function (): RequestHandler {
                 return new Handler\Generic\FileContents(__DIR__ . '/../templates/index.html');

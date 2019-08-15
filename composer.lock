@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5e7a20cf90676bae1d2c37923c5134cb",
+    "content-hash": "ce3a13e9bc714bec1948ff6b6189bfeb",
     "packages": [
         {
             "name": "bnf/di",
@@ -2533,7 +2533,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.5.0"
+        "php": "^7.2"
     },
     "platform-dev": []
 }

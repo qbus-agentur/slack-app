@@ -2,7 +2,9 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp\Service\Client;
 
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Log\LoggerInterface;
+use GuzzleHttp\ClientInterface;
 use Slim\PDO\Database;
 
 /**
@@ -16,16 +18,28 @@ class Slack
     /** @var Database */
     private $db;
 
+    /** @var RequestFactoryInterface */
+    private $requestFactory;
+
+    /** @var ClientInterface */
+    private $client;
+
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(Database $db, LoggerInterface $logger)
-    {
+    public function __construct(
+        Database $db,
+        RequestFactoryInterface $requestFactory,
+        ClientInterface $client,
+        LoggerInterface $logger
+    ) {
         $this->db = $db;
+        $this->requestFactory = $requestFactory;
+        $this->client = $client;
         $this->logger = $logger;
     }
 
-    public function req(string $team, string $method, array $payload): array
+    public function req(string $team, string $method, object $payload): array
     {
         $token = $this->getAccessToken($team);
         if ($token === null) {
@@ -39,18 +53,38 @@ class Slack
             $method
         );
 
+        /*
         $payload['headers']['Authorization'] = 'Bearer ' . $token;
+        $res = $client->request('POST', $api_url, $payload);
+         */
 
         $this->logger->debug('client: posting to slack', [
             'POST',
             $api_url,
-            $payload
+            $token,
+            $payload,
         ]);
 
-        $client = new \GuzzleHttp\Client();
-        $res = $client->request('POST', $api_url, $payload);
+        $request = $this->requestFactory->createRequest('POST', $api_url);
+        $request = $request
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Authorization', 'Bearer ' . $token);
+
+        $body = json_encode($payload);
+        if ($body === false) {
+            throw new \InvalidArgumentException('Payload can not be converted to JSON.');
+        }
+        $request->getBody()->write($body);
+
+        $res = $this->client->send($request);
+
         if ($res->getStatusCode() === 200) {
             $data = json_decode((string) $res->getBody(), true);
+
+            if (($data['ok'] ?? false) === false) {
+                // @todo optimize
+                error_log('unfurl error: ' . (string) $res->getBody());
+            }
             return $data;
         }
 

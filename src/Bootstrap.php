@@ -4,11 +4,12 @@ namespace Qbus\SlackApp;
 
 use Interop\Container\ServiceProviderInterface;
 use Psr\Container\ContainerInterface as CI;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\ClientInterface as GuzzleClientInterface;
 use Slim\App;
 use Slim\Collection;
 use Slim\Interfaces\DispatcherInterface;
@@ -71,6 +72,12 @@ class Bootstrap implements ServiceProviderInterface
                 $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
                 return $logger;
             },
+            GuzzleClient::class => function (CI $c): GuzzleClient {
+                return new GuzzleClient;
+            },
+            GuzzleClientInterface::class => function (CI $c): GuzzleClientInterface {
+                return $c->get(GuzzleClient::class);
+            },
             'guard' => function (CI $c): MiddlewareInterface {
                 return new Middleware\SlackGuard($c->get(LoggerInterface::class));
             },
@@ -95,7 +102,12 @@ class Bootstrap implements ServiceProviderInterface
             },
 
             Service\Client\Slack::class => function (CI $c): Service\Client\Slack {
-                return new Service\Client\Slack($c->get('db'), $c->get(LoggerInterface::class));
+                return new Service\Client\Slack(
+                    $c->get('db'),
+                    $c->get(RequestFactoryInterface::class),
+                    $c->get(GuzzleClientInterface::class),
+                    $c->get(LoggerInterface::class)
+                );
             },
 
             'slack.event:message' => function (CI $c): Event\EventHandlerInterface {

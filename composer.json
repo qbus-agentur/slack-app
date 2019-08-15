@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.0",
+        "php": "^7.2",
         "slim/slim": "^4.0",
         "slim/pdo": "^1.10",
         "container-interop/service-provider": "^0.4.0",

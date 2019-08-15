@@ -73,7 +73,7 @@ class LinkShared implements EventHandlerInterface
                 }
             }
 
-            $this->slack->req($team, 'chat.unfurl', ['json' => (array) $message]);
+            $this->slack->req($team, 'chat.unfurl', $message);
         }
     }
 

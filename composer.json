@@ -11,25 +11,26 @@
         }
     ],
     "config": {
+        "sort-packages": true,
         "platform": {
             "php": "7.2.20"
         }
     },
     "require": {
         "php": "^7.2",
-        "slim/slim": "^4.0",
-        "slim/pdo": "^1.10",
-        "container-interop/service-provider": "^0.4.0",
-        "psr/http-server-middleware": "^1.0",
-        "psr/http-client": "^1.0",
-        "monolog/monolog": "^1.22",
-        "vlucas/phpdotenv": "^3.4",
         "bnf/di": "^0.1.2",
         "bnf/slim-interop-service-provider": "^4.2",
-        "league/html-to-markdown": "^4.8",
-        "zendframework/zend-diactoros": "^2.1",
         "bnf/zend-diactoros-service-provider": "~0.4.0",
-        "sunrise/http-client-curl": "^1.2"
+        "container-interop/service-provider": "^0.4.0",
+        "league/html-to-markdown": "^4.8",
+        "monolog/monolog": "^1.22",
+        "psr/http-client": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "slim/pdo": "^1.10",
+        "slim/slim": "^4.0",
+        "sunrise/http-client-curl": "^1.2",
+        "vlucas/phpdotenv": "^3.4",
+        "zendframework/zend-diactoros": "^2.1"
     },
     "autoload": {
         "psr-4": {

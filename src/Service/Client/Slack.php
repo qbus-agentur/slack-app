@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp\Service\Client;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\ClientInterface;
@@ -39,6 +40,22 @@ class Slack
         $this->logger = $logger;
     }
 
+    private function createRequest(string $api_url, string $token, object $payload): RequestInterface
+    {
+        $request = $this->requestFactory->createRequest('POST', $api_url);
+        $request = $request
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Authorization', 'Bearer ' . $token);
+
+        $body = json_encode($payload);
+        if ($body === false) {
+            throw new \InvalidArgumentException('Payload can not be converted to JSON.');
+        }
+        $request->getBody()->write($body);
+
+        return $request;
+    }
+
     public function req(string $team, string $method, object $payload): array
     {
         $token = $this->getAccessToken($team);
@@ -65,17 +82,7 @@ class Slack
             $payload,
         ]);
 
-        $request = $this->requestFactory->createRequest('POST', $api_url);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withHeader('Authorization', 'Bearer ' . $token);
-
-        $body = json_encode($payload);
-        if ($body === false) {
-            throw new \InvalidArgumentException('Payload can not be converted to JSON.');
-        }
-        $request->getBody()->write($body);
-
+        $request = $this->createRequest($api_url, $token, $payload);
         $res = $this->client->send($request);
 
         if ($res->getStatusCode() === 200) {

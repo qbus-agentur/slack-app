@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface as GuzzleClientInterface;
 use Slim\App;
-use Slim\Collection;
 use Slim\Interfaces\DispatcherInterface;
 use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Handlers\ErrorHandler;
@@ -75,7 +74,7 @@ class Bootstrap implements ServiceProviderInterface
                 $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
                 return $logger;
             },
-            GuzzleClient::class => function (CI $c): GuzzleClient {
+            GuzzleClient::class => function (): GuzzleClient {
                 return new GuzzleClient;
             },
             GuzzleClientInterface::class => function (CI $c): GuzzleClientInterface {
@@ -88,19 +87,19 @@ class Bootstrap implements ServiceProviderInterface
             Handler\Event::class => function (CI $c): RequestHandler {
                 return new Handler\Event($c, $c->get(LoggerInterface::class));
             },
-            Handler\Command::class => function (CI $c): RequestHandler {
+            Handler\Command::class => function (): RequestHandler {
                 return new Handler\Command;
             },
-            Handler\Interaction::class => function (CI $c): RequestHandler {
+            Handler\Interaction::class => function (): RequestHandler {
                 return new Handler\Interaction;
             },
-            Handler\Oauth\Start::class => function (CI $c): RequestHandler {
+            Handler\Oauth\Start::class => function (): RequestHandler {
                 return new Handler\Oauth\Start;
             },
             Handler\Oauth\Callback::class => function (CI $c): RequestHandler {
                 return new Handler\Oauth\Callback($c->get('db'));
             },
-            'handler.start' => function (CI $c): RequestHandler {
+            'handler.start' => function (): RequestHandler {
                 return new Handler\Generic\FileContents(__DIR__ . '/../templates/index.html');
             },
 

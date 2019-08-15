@@ -18,9 +18,9 @@ class Interaction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $body = (string) $request->getBody();
-        $data = json_decode($body);
 
         file_put_contents(__DIR__ . '/../../logs/interaction-' . date('Y-m-d_His'), $body);
+        //$data = json_decode($body);
 
         return new Response;
     }

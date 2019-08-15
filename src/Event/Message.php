@@ -40,8 +40,13 @@ class Message implements EventHandlerInterface
         $channel = $event->channel ?? '';
         $timestamp = $event->message_ts ?? '';
 
-        $request = new \stdClass;
+        //$request = new \stdClass;
 
-        $this->logger->debug('Received message', ['payload' => $payload, 'team' => $team]);
+        $this->logger->debug('Received message', [
+            'payload' => $payload,
+            'team' => $team,
+            'channel' => $channel,
+            'timestamp' => $timestamp,
+        ]);
     }
 }

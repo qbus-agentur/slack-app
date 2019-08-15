@@ -26,11 +26,10 @@
         "vlucas/phpdotenv": "^3.4",
         "bnf/di": "^0.1.2",
         "bnf/slim-interop-service-provider": "^4.2",
-        "guzzlehttp/guzzle": "^6.3",
         "league/html-to-markdown": "^4.8",
         "zendframework/zend-diactoros": "^2.1",
         "bnf/zend-diactoros-service-provider": "~0.4.0",
-        "alextartan/guzzle-psr18-adapter": "^2.0"
+        "sunrise/http-client-curl": "^1.2"
     },
     "autoload": {
         "psr-4": {

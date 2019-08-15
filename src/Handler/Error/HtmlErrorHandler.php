@@ -16,8 +16,6 @@ class HtmlErrorHandler extends HtmlErrorRenderer
      */
     public function __invoke(Throwable $exception, bool $displayErrorDetails): string
     {
-        $title = 'Slim Application Error';
-
         if ($exception instanceof HttpException) {
             $title = $exception->getMessage();
             $html = '';

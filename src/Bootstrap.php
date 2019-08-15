@@ -41,10 +41,10 @@ class Bootstrap implements ServiceProviderInterface
             'slim.display_error_details' => function (CI $c): bool {
                 return $c->get('settings')['displayErrorDetails'];
             },
-            'slim.log_errors' => function (CI $c): bool {
+            'slim.log_errors' => function (): bool {
                 return true;
             },
-            'slim.log_error_detais' => function (CI $c): bool {
+            'slim.log_error_detais' => function (): bool {
                 return true;
             },
             RouteDispatcher::class => function (CI $c): RouteDispatcher {

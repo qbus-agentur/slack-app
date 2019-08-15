@@ -21,6 +21,7 @@
         "slim/pdo": "^1.10",
         "container-interop/service-provider": "^0.4.0",
         "psr/http-server-middleware": "^1.0",
+        "psr/http-client": "^1.0",
         "monolog/monolog": "^1.22",
         "vlucas/phpdotenv": "^3.4",
         "bnf/di": "^0.1.2",
@@ -28,7 +29,8 @@
         "guzzlehttp/guzzle": "^6.3",
         "league/html-to-markdown": "^4.8",
         "zendframework/zend-diactoros": "^2.1",
-        "bnf/zend-diactoros-service-provider": "~0.4.0"
+        "bnf/zend-diactoros-service-provider": "~0.4.0",
+        "alextartan/guzzle-psr18-adapter": "^2.0"
     },
     "autoload": {
         "psr-4": {

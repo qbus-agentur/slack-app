@@ -2,10 +2,10 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp\Service\Client;
 
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Log\LoggerInterface;
-use GuzzleHttp\ClientInterface;
 use Slim\PDO\Database;
 
 /**
@@ -70,11 +70,6 @@ class Slack
             $method
         );
 
-        /*
-        $payload['headers']['Authorization'] = 'Bearer ' . $token;
-        $res = $client->request('POST', $api_url, $payload);
-         */
-
         $this->logger->debug('client: posting to slack', [
             'POST',
             $api_url,
@@ -83,7 +78,7 @@ class Slack
         ]);
 
         $request = $this->createRequest($api_url, $token, $payload);
-        $res = $this->client->send($request);
+        $res = $this->client->sendRequest($request);
 
         if ($res->getStatusCode() === 200) {
             $data = json_decode((string) $res->getBody(), true);

@@ -2,14 +2,14 @@
 declare(strict_types = 1);
 namespace Qbus\SlackApp;
 
+use AlexTartan\GuzzlePsr18Adapter\Client as GuzzlePsr18Client;
 use Interop\Container\ServiceProviderInterface;
+use Psr\Http\Client\ClientInterface;
 use Psr\Container\ContainerInterface as CI;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\ClientInterface as GuzzleClientInterface;
 use Slim\App;
 use Slim\Interfaces\DispatcherInterface;
 use Slim\Interfaces\RouteCollectorInterface;
@@ -74,11 +74,11 @@ class Bootstrap implements ServiceProviderInterface
                 $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
                 return $logger;
             },
-            GuzzleClient::class => function (): GuzzleClient {
-                return new GuzzleClient;
+            GuzzlePsr18Client::class => function (): GuzzlePsr18Client {
+                return new GuzzlePsr18Client;
             },
-            GuzzleClientInterface::class => function (CI $c): GuzzleClientInterface {
-                return $c->get(GuzzleClient::class);
+            ClientInterface::class => function (CI $c): ClientInterface {
+                return $c->get(GuzzlePsr18Client::class);
             },
             'guard' => function (CI $c): MiddlewareInterface {
                 return new Middleware\SlackGuard($c->get(LoggerInterface::class));
@@ -107,7 +107,7 @@ class Bootstrap implements ServiceProviderInterface
                 return new Service\Client\Slack(
                     $c->get('db'),
                     $c->get(RequestFactoryInterface::class),
-                    $c->get(GuzzleClientInterface::class),
+                    $c->get(ClientInterface::class),
                     $c->get(LoggerInterface::class)
                 );
             },

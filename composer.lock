@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a3c7dbcbd4c50e6072f31e08185f4b9",
+    "content-hash": "e34d483a84fc8d76ffc644aa96934ca1",
     "packages": [
+        {
+            "name": "alextartan/guzzle-psr18-adapter",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alextartan/guzzle-psr18-adapter.git",
+                "reference": "ce655874896381b09912093a334c27049497d3f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alextartan/guzzle-psr18-adapter/zipball/ce655874896381b09912093a334c27049497d3f2",
+                "reference": "ce655874896381b09912093a334c27049497d3f2",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "php": ">=7.2",
+                "psr/http-client": "^1.0",
+                "psr/http-message": "1.0.*"
+            },
+            "require-dev": {
+                "ext-mbstring": "*",
+                "ext-xml": "*",
+                "infection/infection": "0.9.*",
+                "php-coveralls/php-coveralls": "~2.1",
+                "phpstan/phpstan": "~0.11",
+                "phpstan/phpstan-phpunit": "~0.11",
+                "phpstan/phpstan-strict-rules": "~0.11",
+                "phpunit/phpunit": "~8.0",
+                "roave/security-advisories": "dev-master",
+                "zendframework/zend-coding-standard": "^1.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AlexTartan\\GuzzlePsr18Adapter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Alex Tartan",
+                    "email": "alex.tartan@gmail.com"
+                }
+            ],
+            "description": "Lightweight wrapper over Guzzle to comply with PSR18",
+            "keywords": [
+                "Guzzle",
+                "adapter",
+                "psr18"
+            ],
+            "time": "2019-05-04T14:10:06+00:00"
+        },
         {
             "name": "bnf/di",
             "version": "0.1.3",
@@ -673,6 +729,55 @@
                 "psr"
             ],
             "time": "2017-02-14T16:28:37+00:00"
+        },
+        {
+            "name": "psr/http-client",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "496a823ef742b632934724bf769560c2a5c7c44e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/496a823ef742b632934724bf769560c2a5c7c44e",
+                "reference": "496a823ef742b632934724bf769560c2a5c7c44e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "time": "2018-10-30T23:29:13+00:00"
         },
         {
             "name": "psr/http-factory",

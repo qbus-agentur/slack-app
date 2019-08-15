@@ -26,11 +26,17 @@ class LinkShared implements EventHandlerInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var string|null */
+    private $activeCollabHost;
+
     public function __construct(Slack $slack, Database $acdb, LoggerInterface $logger)
     {
         $this->slack = $slack;
         $this->acdb = $acdb;
         $this->logger = $logger;
+
+        $activeCollabUrl = getenv('ACTIVECOLLAB_URL') ?: '';
+        $this->activeCollabHost = parse_url($activeCollabUrl, PHP_URL_HOST);
     }
 
     public function handle(\stdClass $payload): void
@@ -107,12 +113,7 @@ class LinkShared implements EventHandlerInterface
             return null;
         }
 
-        $own_host = parse_url(getenv('ACTIVECOLLAB_URL') ?: '', PHP_URL_HOST);
-        if ($own_host === null) {
-            return null;
-        }
-
-        if (($parsed['host'] ?? '') !== $own_host) {
+        if (($parsed['host'] ?? '') !== $this->activeCollabHost) {
             return null;
         }
 

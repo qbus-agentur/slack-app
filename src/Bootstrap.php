@@ -40,10 +40,10 @@ class Bootstrap implements ServiceProviderInterface
                 }
                 return new Config\Config($config);
             },
-            'slim.route_cache_file' => function (CI $c): ?string {
+            'slim.route_cache_file' => function (): ?string {
                 return PHP_SAPI === 'cli-server' ? null : __DIR__ . '/../var/cache/router-cache';
             },
-            'slim.display_error_details' => function (CI $c): bool {
+            'slim.display_error_details' => function (): bool {
                 return PHP_SAPI === 'cli-server'; // set to false in production
             },
             'slim.log_errors' => function (): bool {
@@ -72,7 +72,7 @@ class Bootstrap implements ServiceProviderInterface
 
                 return new Database($dsn, $config->user(), $config->pass());
             },
-            LoggerInterface::class => function (CI $c): LoggerInterface {
+            LoggerInterface::class => function (): LoggerInterface {
                 $path = __DIR__ . '/../var/log/app.log';
                 $level = \Monolog\Logger::DEBUG;
                 $logger = new \Monolog\Logger('qbus/slack-app');
